@@ -1,5 +1,4 @@
 # Python and ML Education Curriculum
-## https://www.youtube.com/@softwareedumgt152 채널의 동영상 강의 자료
 
 ## 📘 1단계. Python 기반 데이터/머신러닝 기초
 
