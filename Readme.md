@@ -22,18 +22,12 @@
 
 ## 실행 방법
 ```bash
-python NumpyExample.py
-python PandasExample.py
-python LinearSample.py
-python HouseSample.py
-python FeatureSample.py
-python SvmSample.py
-python Digits.py
-python BackpropStockSample.py
-python Word2Vec.py
-python ImageMasking.py
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+sudo apt install fonts-nanum
+python -m pip install --upgrade pip
+pip install pylint
 ```
 
-## 참고
-- 예제 데이터는 학습을 위한 **가상 데이터**입니다.
-- 실제 투자 판단에는 추가 검증과 리스크 관리가 필요합니다.
+## 결과 비교는 result 폴더의 파일과 합니다.

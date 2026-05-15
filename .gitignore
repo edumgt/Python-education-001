@@ -1,8 +1,4 @@
 /venv
 *.key
-*.json
-*.log
-*.mp4
-*.mp3
-*.txt
-/Youtube
+*.env
+__pycache__/
