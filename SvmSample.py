@@ -24,6 +24,7 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
 
+
 # 시각화
 def plot_classification(X, y, clf):
     h = 0.02
@@ -40,5 +41,6 @@ def plot_classification(X, y, clf):
     plt.xlabel("Feature 1")
     plt.ylabel("Feature 2")
     plt.show()
+
 
 plot_classification(X, y, model)

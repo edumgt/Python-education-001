@@ -13,7 +13,7 @@ sentences = [
 ]
 
 # Word2Vec 모델 학습
-model = Word2Vec(sentences=sentences, vector_size=100, 
+model = Word2Vec(sentences=sentences, vector_size=100,
                  window=5, min_count=1, workers=4)
 
 # 학습된 단어 목록 확인

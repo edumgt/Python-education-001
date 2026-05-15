@@ -4,8 +4,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 documents = [
     "나는 인공지능을 공부하고 있다",
     "인공지능은 미래의 핵심 기술이다",
-    "인공지능 우리의의 핵심 기술이다",
-    "인공지능 기술을 선도하는 기업업",
+    "인공지능은 우리의 핵심 기술이다",
+    "인공지능 기술을 선도하는 기업",
     "자연어 처리는 인공지능의 한 분야다"
 ]
 
