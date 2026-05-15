@@ -1,35 +1,33 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-# 1. 예제 데이터 생성
+# 포트폴리오 원본 데이터 (결측치 포함)
 data = {
-    '이름': ['철수', '영희', '민수', '지민', '수진', '도윤'],
-    '학년': [1, 1, 2, 2, 2, 1],
-    '수학': [90, 85, np.nan, 75, 82, 88],
-    '영어': [np.nan, 92, 80, 78, np.nan, 85]
+    '종목': ['A전자', 'B바이오', 'C에너지', 'D금융', 'E반도체', 'F플랫폼'],
+    '섹터': ['IT', '헬스케어', '에너지', '금융', 'IT', '서비스'],
+    '보유수량': [15, 20, 35, 12, 18, 10],
+    '매수가': [68000, 42000, np.nan, 51000, 73000, 98000],
+    '현재가': [72000, 39800, 54000, np.nan, 75500, 101000],
 }
 
-df = pd.DataFrame(data)
-print("📌 원본 데이터:")
-print(df)
+portfolio = pd.DataFrame(data)
+print("📌 원본 포트폴리오 데이터")
+print(portfolio)
 
-# 2. 결측치 처리
-print("\n📌 결측치 개수:")
-print(df.isnull().sum())
+print("\n📌 결측치 개수")
+print(portfolio.isnull().sum())
 
-# 평균값으로 결측치 채우기
-df['수학'] = df['수학'].fillna(df['수학'].mean())
-df['영어'] = df['영어'].fillna(df['영어'].mean())
+# 결측치 보정(열 평균)
+for col in ['매수가', '현재가']:
+    portfolio[col] = portfolio[col].fillna(portfolio[col].mean())
 
-print("\n📌 결측치 처리 후:")
-print(df)
+# 평가금액/수익률 계산
+portfolio['평가금액'] = portfolio['보유수량'] * portfolio['현재가']
+portfolio['수익률(%)'] = (portfolio['현재가'] - portfolio['매수가']) / portfolio['매수가'] * 100
 
-# 3. 학년별 평균 점수 (groupby)
-grouped = df.groupby('학년')[['수학', '영어']].mean()
-print("\n📊 학년별 평균 점수:")
-print(grouped)
+print("\n📌 결측치 보정 + 파생지표")
+print(portfolio)
 
-# 4. 결측치 포함 행 제거 예시 (선택적)
-df_dropped = df.dropna()
-print("\n📌 결측치 제거한 데이터:")
-print(df_dropped)
+sector_summary = portfolio.groupby('섹터')[['평가금액', '수익률(%)']].mean()
+print("\n📊 섹터별 평균 평가금액/수익률")
+print(sector_summary)
