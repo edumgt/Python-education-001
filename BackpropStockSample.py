@@ -94,6 +94,7 @@ print(f"\n테스트 MAE: {mae:.4f}")
 # 7) 마지막 5일로 다음 날 주가 예측
 last_window = prices[-window_size:]
 last_window_norm = (last_window - x_min) / (x_max - x_min)
+last_window_norm = np.clip(last_window_norm, 0.0, 1.0)
 z1_next = last_window_norm.reshape(1, -1) @ W1 + b1
 a1_next = sigmoid(z1_next)
 next_day_norm = a1_next @ W2 + b2
