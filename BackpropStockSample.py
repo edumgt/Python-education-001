@@ -23,8 +23,9 @@ y = np.array(y).reshape(-1, 1)
 # 3) 정규화 (학습 안정화를 위해 0~1 스케일)
 x_min, x_max = X.min(), X.max()
 y_min, y_max = y.min(), y.max()
-X_norm = (X - x_min) / (x_max - x_min)
-y_norm = (y - y_min) / (y_max - y_min)
+norm_eps = 1e-8
+X_norm = (X - x_min) / (x_max - x_min + norm_eps)
+y_norm = (y - y_min) / (y_max - y_min + norm_eps)
 
 # 4) 훈련/테스트 분할
 split = int(len(X_norm) * 0.8)
@@ -95,8 +96,10 @@ print(f"\n테스트 MAE: {mae:.4f}")
 
 # 7) 마지막 5일로 다음 날 주가 예측
 last_window = prices[-window_size:]
-last_window_norm = (last_window - x_min) / (x_max - x_min)
+last_window_norm = (last_window - x_min) / (x_max - x_min + norm_eps)
 # 마지막 구간이 학습 정규화 범위를 벗어날 수 있어 [0, 1] 범위로 안정적으로 제한
+if np.any((last_window_norm < 0.0) | (last_window_norm > 1.0)):
+    print("경고: 마지막 입력 구간이 학습 정규화 범위를 벗어나 [0, 1]로 클리핑합니다.")
 last_window_norm = np.clip(last_window_norm, 0.0, 1.0)
 z1_next = last_window_norm.reshape(1, -1) @ W1 + b1
 a1_next = sigmoid(z1_next)
