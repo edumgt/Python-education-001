@@ -31,6 +31,7 @@
 - 인공신경망(ANN) 기본 구조
 - 활성화 함수, 손실 함수, 옵티마이저
 - 과적합 방지: Dropout, EarlyStopping
+- 역전파(Backpropagation) 기반 쉬운 주가 예측 예제: `BackpropStockSample.py`
 
 ### 2-2. TensorFlow/Keras 실습
 - Sequential 모델로 손글씨(MNIST) 분류
