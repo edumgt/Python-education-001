@@ -1,51 +1,35 @@
 import numpy as np
 
-# 1차원 배열
-a = np.array([1, 2, 3, 4])
-print("1차원 배열:", a)
+# 가상 주가 시계열 (5개 종목 x 8일)
+prices = np.array([
+    [100, 101, 103, 102, 104, 106, 107, 109],
+    [80, 79, 81, 82, 83, 84, 86, 87],
+    [50, 51, 52, 54, 53, 55, 57, 58],
+    [120, 118, 119, 121, 122, 124, 123, 125],
+    [30, 31, 30, 32, 33, 34, 35, 36],
+], dtype=float)
 
-# 2차원 배열
-b = np.array([[1, 2], [3, 4]])
-print("2차원 배열:\n", b)
+print("주가 행렬 shape:", prices.shape)
+print("첫 번째 종목 주가:", prices[0])
 
-# 배열의 모양
-print("배열 shape:", b.shape)
+# 일간 수익률 계산
+returns = (prices[:, 1:] - prices[:, :-1]) / prices[:, :-1]
+print("일간 수익률(첫 번째 종목):", returns[0])
 
-# 기본 배열 생성
-zeros = np.zeros((2, 3))
-ones = np.ones((3, 3))
-arr = np.arange(10)
-rand = np.random.rand(2, 2)
+# 종목별 평균 수익률/변동성
+avg_returns = returns.mean(axis=1)
+volatility = returns.std(axis=1)
+print("종목별 평균 수익률:", avg_returns)
+print("종목별 변동성:", volatility)
 
-print("0으로 채운 배열:\n", zeros)
-print("1로 채운 배열:\n", ones)
-print("0부터 9까지 배열:", arr)
-print("랜덤 배열:\n", rand)
+# 가중치 기반 포트폴리오 기대 수익률
+weights = np.array([0.25, 0.2, 0.2, 0.25, 0.1])
+portfolio_expected_return = np.dot(weights, avg_returns)
+print("포트폴리오 기대 일간 수익률:", portfolio_expected_return)
 
-# 통계
-print("평균:", arr.mean())
-print("합계:", arr.sum())
-
-# 배열 연산
-x = np.array([1, 2, 3])
-y = np.array([10, 20, 30])
-print("덧셈:", x + y)
-print("곱셈:", x * y)
-print("제곱:", x ** 2)
-print("브로드캐스팅:", x + 100)
-
-# 행렬 곱
-A = np.array([[1, 2], [3, 4]])
-B = np.array([[2, 0], [1, 3]])
-C = np.dot(A, B)
-print("행렬 곱 결과:\n", C)
-
-# 인덱싱/슬라이싱
-arr2 = np.array([[1, 2, 3], [4, 5, 6]])
-print("두 번째 행:", arr2[1])
-print("첫 행, 두 번째 열:", arr2[0, 1])
-
-# 평균 정규화
-scores = np.array([80, 90, 100, 70])
-normalized = (scores - scores.mean()) / scores.std()
-print("정규화된 점수:", normalized)
+# 마지막 날 기준 리밸런싱 금액 예시
+capital = 1_000_000
+last_prices = prices[:, -1]
+allocation = capital * weights
+shares = allocation / last_prices
+print("종목별 매수 수량(가상):", shares)

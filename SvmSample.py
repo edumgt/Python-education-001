@@ -1,46 +1,43 @@
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
 
-# 데이터 생성
-X, y = make_classification(
-    n_samples=200, n_features=2, n_redundant=0,
-    n_clusters_per_class=1, n_classes=2, random_state=42
-)
+# 2개 특성(모멘텀, 거래량 변화율) 기반 매수/매도 신호 데이터
+np.random.seed(42)
+X = np.random.randn(240, 2)
+X[:, 0] = X[:, 0] * 2.0 + 0.5    # 모멘텀
+X[:, 1] = X[:, 1] * 1.5 - 0.2    # 거래량 변화율
 
-# 데이터 분리
+y = ((X[:, 0] > 0.3) & (X[:, 1] > -0.1)).astype(int)  # 1: 매수, 0: 보류/매도
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42
 )
 
-# SVM 학습
 model = SVC(kernel='linear')
 model.fit(X_train, y_train)
 
-# 예측 및 정확도
 y_pred = model.predict(X_test)
 acc = accuracy_score(y_test, y_pred)
+print(f"신호 분류 정확도: {acc:.2f}")
 
 
-# 시각화
-def plot_classification(X, y, clf):
-    h = 0.02
-    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                         np.arange(y_min, y_max, h))
-    Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
+def plot_signal_boundary(features, labels, clf):
+    step = 0.02
+    x_min, x_max = features[:, 0].min() - 1, features[:, 0].max() + 1
+    y_min, y_max = features[:, 1].min() - 1, features[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, step), np.arange(y_min, y_max, step))
 
-    plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.3)
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.coolwarm, edgecolors='k')
-    plt.title(f"SVM Classification (accuracy: {acc:.2f})")
-    plt.xlabel("Feature 1")
-    plt.ylabel("Feature 2")
+    grid_pred = clf.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    plt.contourf(xx, yy, grid_pred, cmap=plt.cm.coolwarm, alpha=0.25)
+    plt.scatter(features[:, 0], features[:, 1], c=labels, cmap=plt.cm.coolwarm, edgecolors='k')
+    plt.title(f"SVM 매매 신호 경계 (accuracy: {acc:.2f})")
+    plt.xlabel("모멘텀")
+    plt.ylabel("거래량 변화율")
+    plt.tight_layout()
     plt.show()
 
 
-plot_classification(X, y, model)
+plot_signal_boundary(X, y, model)

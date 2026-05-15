@@ -1,32 +1,22 @@
 from gensim.models import Word2Vec
 
-# 예제 데이터
+# 투자 뉴스 토큰 예시
 sentences = [
-    ["나는", "인공지능", "공부하고", "있다"],
-    ["인공지능", "자연어", "처리", "관련이", "있다"],
-    ["인공지능", "머신러닝", "밀접한", "관계가", "있다"],
-    ["인공지능", "산업에서", "활용된다"],
-    ["인공지능", "미래", "기술의", "핵심이다"],
-    ["인공지능", "중요한", "기술이다"],
-    ["인간지능", "중요한", "기술이다"],
-    ["기계지능", "중요한", "기술이다"]
+    ["금리", "인하", "기대", "성장주", "상승"],
+    ["반도체", "실적", "개선", "외국인", "순매수"],
+    ["배당", "확대", "금융주", "투자심리", "개선"],
+    ["원자재", "상승", "제조업", "마진", "악화"],
+    ["달러", "강세", "수출주", "실적", "기대"],
+    ["경기", "둔화", "방어주", "관심", "확대"],
 ]
 
-# Word2Vec 모델 학습
-model = Word2Vec(sentences=sentences, vector_size=100,
-                 window=5, min_count=1, workers=4)
+model = Word2Vec(sentences=sentences, vector_size=50, window=3, min_count=1, workers=4)
 
-# 학습된 단어 목록 확인
 print("학습된 단어 목록:", model.wv.index_to_key)
 
-# 특정 단어 벡터 출력
-if "인공지능" in model.wv:
-    print("인공지능 벡터:", model.wv["인공지능"])
+target_word = "실적"
+if target_word in model.wv:
+    print(f"'{target_word}' 벡터:", model.wv[target_word])
+    print(f"'{target_word}'와 유사한 단어:", model.wv.most_similar(target_word))
 else:
-    print("인공지능 단어가 포함되지 않았습니다.")
-
-# 유사한 단어 찾기
-if "인공지능" in model.wv:
-    print("인공지능과 유사한 단어:", model.wv.most_similar("인공지능"))
-else:
-    print("유사한 단어를 찾을 수 없습니다.")
+    print(f"'{target_word}' 단어가 포함되지 않았습니다.")

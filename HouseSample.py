@@ -1,35 +1,30 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
 
-# 예제 데이터 (주택 면적, 방 개수, 가격)
+# 종목 펀더멘털 예시 데이터 (PER, PBR, ROE -> 기대 수익률)
 data = pd.DataFrame({
-    '면적': [50, 70, 80, 100, 120, 150, 180, 200, 250, 300],
-    '방 개수': [5, 5, 1, 1, 1, 5, 5, 6, 6, 7],
-    '가격': [3000, 5000, 5500, 7000, 8500, 11000,
-           13000, 15000, 18000, 22000]  # 단위: 만 원
+    'PER': [8.1, 10.5, 7.8, 15.2, 11.3, 9.6, 12.4, 6.9, 14.7, 8.8],
+    'PBR': [0.8, 1.2, 0.7, 1.8, 1.1, 0.9, 1.4, 0.6, 1.7, 0.85],
+    'ROE': [14.2, 12.5, 16.1, 9.2, 11.8, 13.7, 10.1, 17.4, 8.6, 15.3],
+    '기대수익률': [9.5, 7.2, 10.4, 4.8, 6.9, 8.1, 5.9, 11.0, 4.5, 9.0],
 })
 
-# 입력(X)과 출력(y) 정의
-X = data[['면적', '방 개수']]
-y = data['가격']
+X = data[['PER', 'PBR', 'ROE']]
+y = data['기대수익률']
 
-# 데이터 분할 (훈련 80%, 테스트 20%)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
-# 선형 회귀 모델 생성 및 학습
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# 예측 수행
 y_pred = model.predict(X_test)
-
-# 모델 성능 평가 (MAE 사용)
 mae = mean_absolute_error(y_test, y_pred)
 print(f"평균 절대 오차(MAE): {mae:.2f}")
 
-# 새 데이터 예측
-new_data = pd.DataFrame({'면적': [220], '방 개수': [5]})
-predicted_price = model.predict(new_data)
-print(f"예측 가격: {predicted_price[0]:.2f} 만 원")
+new_stock = pd.DataFrame({'PER': [9.2], 'PBR': [0.95], 'ROE': [14.8]})
+predicted_return = model.predict(new_stock)
+print(f"예상 수익률: {predicted_return[0]:.2f}%")
