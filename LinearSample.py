@@ -2,7 +2,7 @@ from sklearn.linear_model import LinearRegression
 import numpy as np
 
 # 입력: 공부 시간 (X), 출력: 시험 점수 (y)
-X = np.array([[3], [2], [1], [4], [5]])  # 공부 시간
+X = np.array([[1], [2], [3], [4], [5]])  # 공부 시간
 y = np.array([55, 60, 65, 70, 75])       # 시험 점수
 
 model = LinearRegression()

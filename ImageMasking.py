@@ -28,7 +28,7 @@ highlighted = image.copy()
 highlighted[mask == 1] = 255  # 밝은 값으로 변경
 
 # 4. 시각화
-fig, axs = plt.subplots(1, 3, figsize=(4, 12))
+fig, axs = plt.subplots(1, 3, figsize=(12, 4))
 axs[0].imshow(image, cmap='gray')
 axs[0].set_title("원본 이미지")
 axs[1].imshow(mask, cmap='gray')

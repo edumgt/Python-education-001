@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -8,7 +7,7 @@ from sklearn.metrics import mean_absolute_error
 data = pd.DataFrame({
     '면적': [50, 70, 80, 100, 120, 150, 180, 200, 250, 300],
     '방 개수': [5, 5, 1, 1, 1, 5, 5, 6, 6, 7],
-    '가격': [3000, 5000, 5500, 7000, 8500, 11000, 
+    '가격': [3000, 5000, 5500, 7000, 8500, 11000,
            13000, 15000, 18000, 22000]  # 단위: 만 원
 })
 
