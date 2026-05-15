@@ -37,6 +37,7 @@ hidden_size = 8
 output_size = 1
 learning_rate = 0.05
 epochs = 2000
+SIGMOID_CLIP_RANGE = 500
 
 W1 = np.random.randn(input_size, hidden_size) * 0.1
 b1 = np.zeros((1, hidden_size))
@@ -45,7 +46,7 @@ b2 = np.zeros((1, output_size))
 
 
 def sigmoid(x):
-    x = np.clip(x, -500, 500)
+    x = np.clip(x, -SIGMOID_CLIP_RANGE, SIGMOID_CLIP_RANGE)
     return 1 / (1 + np.exp(-x))
 
 
@@ -94,6 +95,7 @@ print(f"\n테스트 MAE: {mae:.4f}")
 # 7) 마지막 5일로 다음 날 주가 예측
 last_window = prices[-window_size:]
 last_window_norm = (last_window - x_min) / (x_max - x_min)
+# 마지막 구간이 학습 정규화 범위를 아주 조금 벗어날 수 있어 안정적으로 [0, 1] 범위로 제한
 last_window_norm = np.clip(last_window_norm, 0.0, 1.0)
 z1_next = last_window_norm.reshape(1, -1) @ W1 + b1
 a1_next = sigmoid(z1_next)
