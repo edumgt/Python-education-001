@@ -45,6 +45,7 @@ b2 = np.zeros((1, output_size))
 
 
 def sigmoid(x):
+    x = np.clip(x, -500, 500)
     return 1 / (1 + np.exp(-x))
 
 
@@ -93,7 +94,9 @@ print(f"\n테스트 MAE: {mae:.4f}")
 # 7) 마지막 5일로 다음 날 주가 예측
 last_window = prices[-window_size:]
 last_window_norm = (last_window - x_min) / (x_max - x_min)
-next_day_norm = sigmoid(last_window_norm.reshape(1, -1) @ W1 + b1) @ W2 + b2
+z1_next = last_window_norm.reshape(1, -1) @ W1 + b1
+a1_next = sigmoid(z1_next)
+next_day_norm = a1_next @ W2 + b2
 next_day_price = next_day_norm[0, 0] * (y_max - y_min) + y_min
 print(f"다음 날 예측 주가: {next_day_price:.2f}")
 
