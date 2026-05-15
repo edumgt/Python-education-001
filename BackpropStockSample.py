@@ -31,7 +31,7 @@ split = int(len(X_norm) * 0.8)
 X_train, X_test = X_norm[:split], X_norm[split:]
 y_train, y_test = y_norm[:split], y_norm[split:]
 
-# 5) 신경망 구조 (입력 5 -> 은닉 8 -> 출력 1), 역전파 직접 구현
+# 5) 신경망 구조 (입력 5 -> 은닉층 8 -> 출력 1), 역전파 직접 구현
 input_size = window_size
 hidden_size = 8
 output_size = 1
@@ -104,7 +104,7 @@ print(f"다음 날 예측 주가: {next_day_price:.2f}")
 plt.figure(figsize=(10, 4))
 plt.plot(y_test_real, label="실제 주가", linewidth=2)
 plt.plot(y_test_pred, label="예측 주가", linestyle="--")
-plt.title("역전파(Backpropagation) 기반 쉬운 주가 예측 예제")
+plt.title("주가 예측 결과")
 plt.xlabel("테스트 구간 인덱스")
 plt.ylabel("주가")
 plt.legend()
