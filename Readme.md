@@ -178,13 +178,10 @@ $$\text{Output} = WX + b$$
 - [PcaStockReduce.py](PcaStockReduce.py): 6가지 주식 지표를 2차원으로 압축해 시각화 *(PCA)*
   > 예시: PER·PBR·ROE·변동성 등 6가지 숫자를 딱 2개로 줄여서 그래프에 표시합니다.
 
-### 5) 자연어 처리
+### 5) 보조 유틸리티
 
-- [TfidfNewsFeature.py](TfidfNewsFeature.py): 투자 뉴스 문장 TF-IDF 특징 추출
-  > 예시: 뉴스에서 "급등", "실적" 같은 중요한 단어를 숫자로 바꿉니다.
-
-- [Word2VecEmbedding.py](Word2VecEmbedding.py): 투자 뉴스 토큰 임베딩 및 유사 단어 탐색
-  > 예시: "반도체"와 "삼성"이 뉴스에서 자주 같이 나온다면 두 단어를 가깝게 배치합니다.
+- [korean_font.py](korean_font.py): OS별 한글 폰트 자동 설정 유틸리티
+  > 예시: matplotlib 그래프에서 한글 제목/축 라벨이 깨지지 않도록 폰트를 자동으로 지정합니다.
 
 ### 6) 시계열 분석
 
@@ -261,9 +258,9 @@ pip install pylint
 
 ---
 
-### SvmTradeSignal.png — SVM 매매 신호 경계선
+### SvmTradeSignal_078935_KS.png — SVM 매매 신호 경계선
 
-![SvmTradeSignal](result/SvmTradeSignal.png)
+![SvmTradeSignal](result/SvmTradeSignal_078935_KS.png)
 
 **무엇을 보여주나요?**
 그래프가 **분홍색 구역**과 **파란색 구역**으로 나뉘어져 있고, 가운데 대각선이 경계선입니다.
@@ -277,9 +274,9 @@ pip install pylint
 
 ---
 
-### SvmMarketPhase.png — RSI/MACD 기반 시장 국면 예측
+### SvmMarketPhase_078935_KS.png — RSI/MACD 기반 시장 국면 예측
 
-![SvmMarketPhase](result/SvmMarketPhase.png)
+![SvmMarketPhase](result/SvmMarketPhase_078935_KS.png)
 
 **무엇을 보여주나요?**
 가로축은 RSI(과매수/과매도 지표), 세로축은 MACD(추세 강도 지표)입니다.
@@ -292,9 +289,9 @@ pip install pylint
 
 ---
 
-### NeuralNetBackprop.png — 신경망 역전파 주가 예측 결과
+### NeuralNetBackprop_078935_KS.png — 신경망 역전파 주가 예측 결과
 
-![NeuralNetBackprop](result/NeuralNetBackprop.png)
+![NeuralNetBackprop](result/NeuralNetBackprop_078935_KS.png)
 
 **무엇을 보여주나요?**
 파란 실선(실제 주가)과 주황 점선(예측 주가)을 비교합니다.
@@ -364,9 +361,9 @@ pip install pylint
 
 ---
 
-### TimeSeriesAnalysis.png — 시계열 분석 종합
+### TimeSeriesAnalysis_078935_KS.png — 시계열 분석 종합
 
-![TimeSeriesAnalysis](result/TimeSeriesAnalysis.png)
+![TimeSeriesAnalysis](result/TimeSeriesAnalysis_078935_KS.png)
 
 **무엇을 보여주나요?**
 3행으로 구성된 종합 분석 차트입니다.
@@ -388,9 +385,9 @@ pip install pylint
 
 ---
 
-### ArimaStockForecast.png — ARIMA 주가 예측
+### ArimaStockForecast_078935_KS.png — ARIMA 주가 예측
 
-![ArimaStockForecast](result/ArimaStockForecast.png)
+![ArimaStockForecast](result/ArimaStockForecast_078935_KS.png)
 
 **무엇을 보여주나요?**
 위아래 2개 패널이 있습니다.
@@ -410,9 +407,9 @@ pip install pylint
 
 ---
 
-### RnnBackprop.png — 바닐라 RNN 학습 결과
+### RnnBackprop_078935_KS.png — 바닐라 RNN 학습 결과
 
-![RnnBackprop](result/RnnBackprop.png)
+![RnnBackprop](result/RnnBackprop_078935_KS.png)
 
 **무엇을 보여주나요?**
 2개 패널이 나란히 있습니다.
@@ -432,9 +429,9 @@ pip install pylint
 
 ---
 
-### LstmStockPyTorch.png — PyTorch LSTM 주가 예측
+### LstmStockPyTorch_078935_KS.png — PyTorch LSTM 주가 예측
 
-![LstmStockPyTorch](result/LstmStockPyTorch.png)
+![LstmStockPyTorch](result/LstmStockPyTorch_078935_KS.png)
 
 **무엇을 보여주나요?**
 2개 패널이 나란히 있습니다.
@@ -453,9 +450,9 @@ pip install pylint
 
 ---
 
-### LogisticTradeSignal.png — 로지스틱 회귀 매수/매도 확률
+### LogisticTradeSignal_078935_KS.png — 로지스틱 회귀 매수/매도 확률
 
-![LogisticTradeSignal](result/LogisticTradeSignal.png)
+![LogisticTradeSignal](result/LogisticTradeSignal_078935_KS.png)
 
 **무엇을 보여주나요?**
 배경 색깔이 그라데이션으로 칠해져 있고, 그 위에 실제 매수/매도 신호 점들이 찍혀 있습니다.
@@ -471,9 +468,9 @@ pip install pylint
 
 ---
 
-### CnnTimeSeriesFeature.png — 1D CNN 시계열 특징 추출
+### CnnTimeSeriesFeature_078935_KS.png — 1D CNN 시계열 특징 추출
 
-![CnnTimeSeriesFeature](result/CnnTimeSeriesFeature.png)
+![CnnTimeSeriesFeature](result/CnnTimeSeriesFeature_078935_KS.png)
 
 **무엇을 보여주나요?**
 4개 패널로 구성됩니다.
@@ -494,9 +491,9 @@ pip install pylint
 
 ---
 
-### CnnCandleChart.png — 2D CNN 캔들차트 이미지 분류
+### CnnCandleChart_078935_KS.png — 2D CNN 캔들차트 이미지 분류
 
-![CnnCandleChart](result/CnnCandleChart.png)
+![CnnCandleChart](result/CnnCandleChart_078935_KS.png)
 
 **무엇을 보여주나요?**
 3행 4열 레이아웃입니다.
@@ -514,9 +511,9 @@ pip install pylint
 
 ---
 
-### CnnLstmHybrid.png — CNN+LSTM 하이브리드 분류
+### CnnLstmHybrid_078935_KS.png — CNN+LSTM 하이브리드 분류
 
-![CnnLstmHybrid](result/CnnLstmHybrid.png)
+![CnnLstmHybrid](result/CnnLstmHybrid_078935_KS.png)
 
 **무엇을 보여주나요?**
 2×2 레이아웃 + 모델 구조 텍스트입니다.
@@ -531,9 +528,9 @@ pip install pylint
 
 ---
 
-### TransformerAttention.png — Transformer Self-Attention
+### TransformerAttention_078935_KS.png — Transformer Self-Attention
 
-![TransformerAttention](result/TransformerAttention.png)
+![TransformerAttention](result/TransformerAttention_078935_KS.png)
 
 **무엇을 보여주나요?**
 2행 3열 레이아웃입니다.
@@ -579,9 +576,9 @@ pip install pylint
 
 ---
 
-### YfinanceNormalize.png — yfinance 정규화 비교
+### YfinanceNormalize_078935_KS.png — yfinance 정규화 비교
 
-![YfinanceNormalize](result/YfinanceNormalize.png)
+![YfinanceNormalize](result/YfinanceNormalize_078935_KS.png)
 
 **무엇을 보여주나요?**
 3행 2열 레이아웃입니다.
