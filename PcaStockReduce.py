@@ -78,12 +78,56 @@ ax1.legend()
 
 sc = ax2.scatter(X_2d[:, 0], X_2d[:, 1], c=avg_return, cmap='RdYlGn',
                  alpha=0.8, edgecolors='k', linewidths=0.3)
-plt.colorbar(sc, ax=ax2, label='수익률')
+cbar = plt.colorbar(sc, ax=ax2, label='수익률')
 ax2.set_xlabel(f"PC1 ({explained[0] * 100:.1f}%)")
 ax2.set_ylabel(f"PC2 ({explained[1] * 100:.1f}%)")
 ax2.set_title("6차원 → 2차원 PCA 압축")
 
-plt.tight_layout()
+# ── 어노테이션: 그래프 상단 한 줄 요약 ──────────────────────────────────
+fig.text(0.5, 0.98,
+         "6가지 지표를 딱 2개로 줄여도 수익률 높은 주식과 낮은 주식을 구분할 수 있어요 (PCA)",
+         ha='center', fontsize=9, color='#333', weight='bold')
+
+# ── 어노테이션: 설명분산 패널 — 첫 번째 막대 위 화살표 "PC1 가장 중요" ──
+ax1.annotate("PC1: 가장 중요한 방향",
+             xy=(1, explained[0]),
+             xytext=(1.8, explained[0] + 0.12),
+             arrowprops=dict(arrowstyle='->', color='gray'),
+             fontsize=7, color='#333')
+
+# ── 어노테이션: 설명분산 패널 — 누적 70% 부근 표시 ─────────────────────
+idx_70 = next((i for i, c in enumerate(cumulative) if c >= 0.70), 1)
+ax1.annotate("여기까지만으로\n정보의 70% 이상!",
+             xy=(idx_70 + 1, cumulative[idx_70]),
+             xytext=(idx_70 + 1.5, cumulative[idx_70] - 0.18),
+             arrowprops=dict(arrowstyle='->', color='tomato'),
+             fontsize=7, color='tomato')
+
+# ── 어노테이션: 설명분산 패널 — x축 보충 ────────────────────────────────
+ax1.text(0.5, -0.18,
+         "숫자가 작을수록 더 중요한 주성분이에요",
+         transform=ax1.transAxes, ha='center', fontsize=7, color='gray')
+
+# ── 어노테이션: 2D 산점도 패널 — 안내 텍스트 ────────────────────────────
+ax2.text(0.5, 1.07,
+         "원래 6개 숫자를 2개로 줄였어요",
+         transform=ax2.transAxes, ha='center', fontsize=8, color='#333',
+         bbox=dict(boxstyle='round,pad=0.3', fc='lightyellow', alpha=0.8, ec='gold'))
+
+# ── 어노테이션: 2D 산점도 패널 — 컬러 의미 설명 ─────────────────────────
+ax2.text(1.22, 0.75,
+         "초록=수익\n높음",
+         transform=ax2.transAxes, ha='center', fontsize=7, color='seagreen')
+ax2.text(1.22, 0.25,
+         "빨강=수익\n낮음",
+         transform=ax2.transAxes, ha='center', fontsize=7, color='tomato')
+
+# ── 어노테이션: 2D 산점도 패널 — x축 보충 ───────────────────────────────
+ax2.text(0.5, -0.18,
+         "PC1·PC2 두 숫자만으로 주식을 2D 지도에 표현했어요",
+         transform=ax2.transAxes, ha='center', fontsize=7, color='gray')
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.savefig("result/PcaStockReduce.png", dpi=150, bbox_inches="tight")
 print("   → 그래프 저장: result/PcaStockReduce.png")
 

@@ -57,11 +57,49 @@ time.sleep(0.5)
 points = X_test[:40]
 preds = y_pred[:40]
 colors = np.where(preds == 1, 'tomato', 'royalblue')
-plt.figure(figsize=(7, 4))
-plt.scatter(points[:, 0], points[:, 1], c=colors, alpha=0.7)
-plt.title("RSI-MACD 기반 시장 국면 예측")
-plt.xlabel("RSI")
-plt.ylabel("MACD")
+fig, ax = plt.subplots(figsize=(7, 4))
+ax.scatter(points[:, 0], points[:, 1], c=colors, alpha=0.7)
+ax.set_title("RSI-MACD 기반 시장 국면 예측")
+ax.set_xlabel("RSI")
+ax.set_ylabel("MACD")
+
+# ── 초등학생도 이해할 수 있는 한글 설명 어노테이션 ──────────────────────────
+# x축 보충 설명
+ax.text(0.5, -0.18, 'RSI → 70 이상이면 \'너무 많이 올랐다\' 신호 / 30 이하면 \'너무 많이 내렸다\' 신호',
+        transform=ax.transAxes, ha='center', fontsize=7, color='gray')
+# y축 보충 설명
+ax.text(-0.2, 0.5, 'MACD → 양수면 상승 추세, 음수면 하락 추세',
+        transform=ax.transAxes, va='center', rotation=90, fontsize=7, color='gray')
+
+# 빨간 점 밀집 구역(상승장) 설명
+bull_pts = points[preds == 1]
+if len(bull_pts) > 0:
+    bx, by = bull_pts[:, 0].mean(), bull_pts[:, 1].mean()
+    ax.text(bx, by + 0.25, '상승장 구역 📈', fontsize=8, color='darkred', ha='center',
+            bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8, edgecolor='tomato'))
+    # 빨간 점 하나에 화살표
+    ax.annotate('상승장\n예측 점', xy=(bull_pts[0, 0], bull_pts[0, 1]),
+                xytext=(bull_pts[0, 0] + 5, bull_pts[0, 1] - 0.6),
+                fontsize=7, color='darkred',
+                arrowprops=dict(arrowstyle='->', color='darkred', lw=1.0))
+
+# 파란 점 밀집 구역(하락장) 설명
+bear_pts = points[preds == 0]
+if len(bear_pts) > 0:
+    dx, dy = bear_pts[:, 0].mean(), bear_pts[:, 1].mean()
+    ax.text(dx, dy - 0.25, '하락장 구역 📉', fontsize=8, color='navy', ha='center',
+            bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8, edgecolor='royalblue'))
+    # 파란 점 하나에 화살표
+    ax.annotate('하락장\n예측 점', xy=(bear_pts[0, 0], bear_pts[0, 1]),
+                xytext=(bear_pts[0, 0] - 8, bear_pts[0, 1] + 0.6),
+                fontsize=7, color='navy',
+                arrowprops=dict(arrowstyle='->', color='navy', lw=1.0))
+
+# 전체 그래프 한 줄 요약
+fig.text(0.5, 0.995, 'RSI와 MACD 두 지표로 지금 시장이 오르는 중인지 내리는 중인지 판단합니다',
+         ha='center', fontsize=9, color='#333', weight='bold', va='top')
+# ────────────────────────────────────────────────────────────────────────────
+
 plt.tight_layout()
 plt.savefig("result/SvmMarketPhase.png", dpi=150, bbox_inches="tight")
 print("   → 그래프 저장: result/SvmMarketPhase.png")

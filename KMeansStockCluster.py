@@ -75,19 +75,70 @@ for name in ['성장주', '가치주', '방어주']:
 print("\n[6/6] 군집 시각화 중...")
 time.sleep(0.5)
 colors = {'성장주': 'tomato', '가치주': 'royalblue', '방어주': 'seagreen'}
-plt.figure(figsize=(7, 5))
+fig, ax = plt.subplots(figsize=(7, 5))
 for name, color in colors.items():
     mask = [n == name for n in label_names]
-    plt.scatter(X[mask, 0], X[mask, 1], label=name, color=color,
-                alpha=0.7, edgecolors='k', linewidths=0.4)
+    ax.scatter(X[mask, 0], X[mask, 1], label=name, color=color,
+               alpha=0.7, edgecolors='k', linewidths=0.4)
 centers_inv = scaler.inverse_transform(kmeans.cluster_centers_)
-plt.scatter(centers_inv[:, 0], centers_inv[:, 1], marker='X', s=200,
-            color='black', zorder=5, label='군집 중심')
-plt.xlabel("평균 수익률")
-plt.ylabel("변동성")
-plt.title("K-Means 군집화: 주식 유형 자동 분류")
-plt.legend()
-plt.tight_layout()
+ax.scatter(centers_inv[:, 0], centers_inv[:, 1], marker='X', s=200,
+           color='black', zorder=5, label='군집 중심')
+ax.set_xlabel("평균 수익률")
+ax.set_ylabel("변동성")
+ax.set_title("K-Means 군집화: 주식 유형 자동 분류")
+ax.legend()
+
+# ── 어노테이션: 그래프 상단 한 줄 요약 ──────────────────────────────────
+fig.text(0.5, 0.98,
+         "아무도 가르쳐 주지 않아도 비슷한 주식끼리 자동으로 묶어줍니다 (K-Means)",
+         ha='center', fontsize=9, color='#333', weight='bold')
+
+# ── 어노테이션: x축 보충 설명 ───────────────────────────────────────────
+ax.text(0.5, -0.15,
+        "← 수익률 낮음 / 수익률 높음 →",
+        transform=ax.transAxes, ha='center', fontsize=7, color='gray')
+
+# ── 어노테이션: y축 보충 설명 ───────────────────────────────────────────
+ax.text(-0.18, 0.5,
+        "위험도(변동성) — 위로 갈수록 주가가 더 들쭉날쭉",
+        transform=ax.transAxes, ha='center', fontsize=7, color='gray',
+        rotation=90, va='center')
+
+# ── 어노테이션: 각 군집 중심 근처에 군집 설명 텍스트 ───────────────────
+for i, (name, center) in enumerate(zip(['성장주', '가치주', '방어주'],
+                                        centers_inv[order])):
+    descriptions = {
+        '성장주': "성장주\n(수익 높고\n위험도 높음)",
+        '가치주': "가치주\n(수익·위험\n중간)",
+        '방어주': "방어주\n(수익 낮고\n안전)",
+    }
+    offsets = {
+        '성장주': (0.012, 0.025),
+        '가치주': (0.008, 0.015),
+        '방어주': (0.005, -0.015),
+    }
+    ox, oy = offsets[name]
+    ax.text(center[0] + ox, center[1] + oy,
+            descriptions[name],
+            fontsize=8, color='#333', ha='left',
+            bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.7, ec='gray'))
+
+# ── 어노테이션: 군집 경계 부근 안내 텍스트 ─────────────────────────────
+ax.text(0.50, 0.50,
+        "컴퓨터가 스스로\n그룹을 나눴어요",
+        transform=ax.transAxes, ha='center', fontsize=8,
+        color='dimgray', style='italic',
+        bbox=dict(boxstyle='round,pad=0.4', fc='lightyellow', alpha=0.7, ec='gold'))
+
+# ── 어노테이션: 군집 중심 화살표 ────────────────────────────────────────
+ax.annotate("군집 중심\n(X 표시)",
+            xy=(centers_inv[order[0], 0], centers_inv[order[0], 1]),
+            xytext=(centers_inv[order[0], 0] - 0.03,
+                    centers_inv[order[0], 1] + 0.06),
+            arrowprops=dict(arrowstyle='->', color='gray'),
+            fontsize=7, color='#333', ha='center')
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.savefig("result/KMeansStockCluster.png", dpi=150, bbox_inches="tight")
 print("   → 그래프 저장: result/KMeansStockCluster.png")
 

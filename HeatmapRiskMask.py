@@ -60,9 +60,47 @@ for ax in axs:
     ax.set_xticks([])
     ax.set_yticks([])
 
+# ── 어노테이션: 그래프 상단 한 줄 요약 ──────────────────────────────────
+fig.text(0.5, 0.98,
+         "주가가 크게 오르내린 '위험한 날'을 자동으로 찾아 표시합니다",
+         ha='center', fontsize=9, color='#333', weight='bold')
+
+# ── 어노테이션: 각 패널 위 구역 텍스트 ──────────────────────────────────
+axs[0].text(0.5, 1.06,
+            "원본: 초록=이익 / 빨강=손실",
+            transform=axs[0].transAxes, ha='center', fontsize=8, color='#333',
+            bbox=dict(boxstyle='round,pad=0.3', fc='lightyellow', alpha=0.8, ec='gold'))
+
+axs[1].text(0.5, 1.06,
+            "위험 구간만 흰색으로 표시",
+            transform=axs[1].transAxes, ha='center', fontsize=8, color='#333',
+            bbox=dict(boxstyle='round,pad=0.3', fc='lightyellow', alpha=0.8, ec='gold'))
+
+axs[2].text(0.5, 1.06,
+            "위험 구간을 더 진하게 강조",
+            transform=axs[2].transAxes, ha='center', fontsize=8, color='#333',
+            bbox=dict(boxstyle='round,pad=0.3', fc='lightyellow', alpha=0.8, ec='gold'))
+
+# ── 어노테이션: 마스크 패널의 흰색 칸 하나를 가리키는 화살표 ─────────────
+# 위험 셀(흰색=1) 중 첫 번째 위치 찾기
+risk_positions = np.argwhere(risk_mask == 1)
+if len(risk_positions) > 0:
+    row_r, col_r = risk_positions[0]
+    axs[1].annotate("이 날 이 종목이\n±2% 이상 크게\n움직였어요",
+                    xy=(col_r, row_r),
+                    xytext=(col_r + 5, row_r - 5),
+                    arrowprops=dict(arrowstyle='->', color='gray'),
+                    fontsize=7, color='#333', ha='center',
+                    bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.85, ec='gray'))
+
+# ── 어노테이션: 원본 패널 x축 보충 ─────────────────────────────────────
+axs[0].text(0.5, -0.08,
+            "가로축: 종목 번호 / 세로축: 거래일 번호",
+            transform=axs[0].transAxes, ha='center', fontsize=7, color='gray')
+
 print("\n[5/5] 그래프 저장 중...")
 time.sleep(0.4)
-plt.tight_layout()
+plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.savefig("result/HeatmapRiskMask.png", dpi=150, bbox_inches="tight")
 print("   → 그래프 저장: result/HeatmapRiskMask.png")
 

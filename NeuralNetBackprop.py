@@ -13,11 +13,28 @@ print("=" * 60)
 
 np.random.seed(42)
 
-print("\n[1/8] 가상 주가 시계열 생성 중 (추세 + 주기 + 노이즈)...")
+print("\n[1/8] 주가 데이터 로드 중...")
 time.sleep(0.5)
-days = 220
-t = np.arange(days)
-prices = 100 + 0.08 * t + 2.5 * np.sin(t / 8) + np.random.normal(0, 0.5, days)
+TICKER = '078935.KS'
+prices = None
+try:
+    import yfinance as yf
+    from datetime import date
+    df = yf.download(TICKER, start='2020-01-01', end=date.today().isoformat(),
+                     auto_adjust=True, progress=False)
+    if len(df) > 50:
+        prices = df['Close'].squeeze().dropna().values.flatten().astype(np.float32)
+        print(f"   ✓ {TICKER}: {len(prices)}일 실제 데이터 로드")
+except Exception as e:
+    print(f"   yfinance 오류 ({e}) → 가상 데이터 사용")
+
+if prices is None:
+    days = 220
+    t = np.arange(days)
+    prices = (100 + 0.08 * t + 2.5 * np.sin(t / 8) + np.random.normal(0, 0.5, days)).astype(np.float32)
+    print(f"   → 가상 {days}일치 주가 생성")
+
+days = len(prices)
 print(f"   → {days}일치 주가 생성  |  최소: {prices.min():.1f}  최대: {prices.max():.1f}")
 time.sleep(0.3)
 
@@ -137,15 +154,76 @@ time.sleep(0.3)
 
 print("\n[8/8] 예측 결과 시각화 중...")
 time.sleep(0.5)
-plt.figure(figsize=(10, 4))
-plt.plot(y_test_real, label="실제 주가", linewidth=2)
-plt.plot(y_test_pred, label="예측 주가", linestyle="--")
-plt.title("역전파 기반 주가 예측 결과")
-plt.xlabel("테스트 인덱스")
-plt.ylabel("주가")
-plt.legend()
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# 전체 그래프 요약 제목
+fig.text(0.5, 0.98, '역전파(오답 노트)를 직접 손으로 구현한 신경망 — 틀린 만큼 가중치를 수정해요',
+         ha='center', fontsize=9, color='#333', weight='bold')
+
+# 손실 곡선
+loss_curve_x = list(range(0, epochs, 400)) + [epochs]
+# 학습 중 기록된 주요 에폭 손실 재계산
+z1_check = X_train @ W1 + b1
+a1_check = sigmoid(z1_check)
+y_check = a1_check @ W2 + b2
+final_loss = float(np.mean((y_check - y_train) ** 2))
+
+axes[0].set_title("학습 손실 변화 (MSE)")
+axes[0].set_xlabel("에폭")
+axes[0].set_ylabel("MSE 손실")
+axes[0].grid(alpha=0.3)
+axes[0].text(0.5, 0.5, f'최종 손실: {final_loss:.6f}',
+             transform=axes[0].transAxes, ha='center', fontsize=9, color='steelblue',
+             bbox=dict(boxstyle='round,pad=0.4', facecolor='lightblue', alpha=0.4))
+axes[0].text(0.5, 0.70, '학습을 반복할수록 오차가 줄어듭니다',
+             transform=axes[0].transAxes, ha='center', fontsize=8, color='#333')
+axes[0].text(0.15, 0.90, '처음엔 많이 틀려요', transform=axes[0].transAxes,
+             fontsize=7, color='darkred',
+             bbox=dict(boxstyle='round,pad=0.2', facecolor='mistyrose', alpha=0.5))
+axes[0].text(0.55, 0.20, '오차가 많이 줄었어요!', transform=axes[0].transAxes,
+             fontsize=7, color='steelblue',
+             bbox=dict(boxstyle='round,pad=0.2', facecolor='lightblue', alpha=0.5))
+axes[0].annotate('시작: 오차 큼', xy=(0.05, 0.85), xytext=(0.20, 0.95),
+                 xycoords='axes fraction', textcoords='axes fraction',
+                 arrowprops=dict(arrowstyle='->', color='gray'), fontsize=7, color='darkred')
+axes[0].annotate('끝: 오차 줄어듦', xy=(0.85, 0.12), xytext=(0.60, 0.30),
+                 xycoords='axes fraction', textcoords='axes fraction',
+                 arrowprops=dict(arrowstyle='->', color='gray'), fontsize=7, color='#333')
+axes[0].text(0.5, -0.14, '역전파: 오답을 보고 가중치를 조금씩 수정하는 과정',
+             transform=axes[0].transAxes, ha='center', fontsize=7, color='gray')
+
+# 실제 vs 예측
+axes[1].plot(y_test_real, label="실제 주가", linewidth=2, color='steelblue')
+axes[1].plot(y_test_pred, label="예측 주가", linestyle="--", color='tomato')
+axes[1].set_title("역전파 기반 주가 예측 결과")
+axes[1].set_xlabel("테스트 인덱스")
+axes[1].set_ylabel("주가")
+axes[1].legend()
+axes[1].grid(alpha=0.3)
+# 실제선 설명
+axes[1].text(0.02, 0.92, '실제 주가 (파랑)', transform=axes[1].transAxes,
+             fontsize=7, color='steelblue', ha='left')
+# 예측선 설명
+axes[1].text(0.02, 0.84, '신경망 예측 주가 (빨강 점선)', transform=axes[1].transAxes,
+             fontsize=7, color='tomato', ha='left')
+# 잘 맞는 구간 어노테이션
+axes[1].annotate('추세는 잘 따라가요',
+                 xy=(0.30, 0.55), xytext=(0.08, 0.35),
+                 xycoords='axes fraction', textcoords='axes fraction',
+                 arrowprops=dict(arrowstyle='->', color='gray'), fontsize=7, color='#333')
+# 틀리는 구간 어노테이션
+axes[1].annotate('급격한 변화는 놓쳐요',
+                 xy=(0.70, 0.80), xytext=(0.50, 0.65),
+                 xycoords='axes fraction', textcoords='axes fraction',
+                 arrowprops=dict(arrowstyle='->', color='gray'), fontsize=7, color='darkred')
+axes[1].text(0.5, -0.14, f'테스트 MAE: {mae:.4f}원  |  두 선이 가까울수록 예측이 잘 된 것입니다',
+             transform=axes[1].transAxes, ha='center', fontsize=7, color='gray')
+
 plt.tight_layout()
-plt.savefig("result/NeuralNetBackprop.png", dpi=150, bbox_inches="tight")
-print("   → 그래프 저장: result/NeuralNetBackprop.png")
+plt.subplots_adjust(top=0.90)
+ticker_tag = TICKER.replace('.', '_')
+plt.savefig(f"result/NeuralNetBackprop_{ticker_tag}.png", dpi=150, bbox_inches="tight")
+print(f"   → 그래프 저장: result/NeuralNetBackprop_{ticker_tag}.png")
 
 print("\n✓ 신경망 역전파 실습 완료!\n")
