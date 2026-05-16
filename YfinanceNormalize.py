@@ -23,36 +23,27 @@ print("  └──────────────────────�
 print("\n[1/7] 주가 데이터 로드 중...")
 time.sleep(0.4)
 
+TICKER = '078935.KS'
+prices = None
 try:
     import yfinance as yf
     from datetime import date
-    today = date.today().isoformat()
-    TICKERS = ['AAPL', '005930.KS', '^GSPC']   # 애플, 삼성, S&P500
-    raw_data = {}
-    for ticker in TICKERS:
-        df = yf.download(ticker, start='2023-01-01', end=today,
-                         auto_adjust=True, progress=False)
-        if len(df) > 0:
-            close = df['Close'].squeeze().dropna()   # DataFrame→Series 보정
-            raw_data[ticker] = close
-            print(f"   ✓ {ticker}: {len(raw_data[ticker])}일 데이터 로드")
-        else:
-            print(f"   ✗ {ticker}: 데이터 없음 (가상 데이터로 대체)")
-    use_real = len(raw_data) > 0
+    df = yf.download(TICKER, start='2020-01-01', end=date.today().isoformat(),
+                     auto_adjust=True, progress=False)
+    if len(df) > 50:
+        prices = df['Close'].squeeze().dropna()
+        print(f"   ✓ {TICKER}: {len(prices)}일 데이터 로드")
 except Exception as e:
-    use_real = False
     print(f"   yfinance 연결 실패 ({e}) → 가상 데이터로 실습")
 
-if not use_real:
+if prices is None:
     np.random.seed(42)
     days = 500
     t = np.arange(days)
-    raw_data = {
-        'AAPL':      pd.Series(150 + 0.15*t + 10*np.sin(t/30) + np.random.normal(0,3,days)),
-        '005930.KS': pd.Series(70000 + 30*t + 4000*np.sin(t/40) + np.random.normal(0,1000,days)),
-        '^GSPC':     pd.Series(4000 + 0.8*t + 200*np.sin(t/25) + np.random.normal(0,50,days)),
-    }
-    print("   → 가상 AAPL / 삼성 / S&P500 데이터 생성 완료")
+    prices = pd.Series(50000 + 20*t + 5000*np.sin(t/40) + np.random.normal(0, 1000, days))
+    print(f"   → 가상 {len(prices)}일치 주가 생성")
+
+raw_data = {TICKER: prices}
 time.sleep(0.3)
 
 # ── 2. 세 가지 정규화 함수 정의 ───────────────────────────
@@ -133,27 +124,26 @@ time.sleep(0.4)
 print("\n[7/7] 시각화 저장 중...")
 time.sleep(0.5)
 
-tickers = list(normalized_results.keys())
-colors  = ['steelblue', 'tomato', 'mediumseagreen']
+res    = normalized_results[TICKER]
+p_vals = res['prices'].values
+mm_vals = res['minmax'].values
+zs_vals = res['zscore'].values
+lr_vals = res['logret'].values
 
 fig = plt.figure(figsize=(14, 12))
 
 # 원본 가격
 ax1 = fig.add_subplot(3, 2, 1)
-for ticker, color in zip(tickers, colors):
-    prices = normalized_results[ticker]['prices']
-    ax1.plot(prices.values, label=ticker, color=color, linewidth=1.2)
-ax1.set_title("① 원본 가격 (스케일 불일치)")
+ax1.plot(p_vals, color='steelblue', linewidth=1.2, label=TICKER)
+ax1.set_title(f"① 원본 가격 ({TICKER})")
 ax1.set_xlabel("거래일")
-ax1.set_ylabel("가격")
+ax1.set_ylabel("주가 (원)")
 ax1.legend(fontsize=8)
 ax1.grid(alpha=0.3)
 
 # Min-Max 정규화
 ax2 = fig.add_subplot(3, 2, 2)
-for ticker, color in zip(tickers, colors):
-    mm = normalized_results[ticker]['minmax']
-    ax2.plot(mm.values, label=ticker, color=color, linewidth=1.2)
+ax2.plot(mm_vals, color='tomato', linewidth=1.2, label='Min-Max')
 ax2.set_title("② Min-Max 정규화 [0, 1]")
 ax2.set_xlabel("거래일")
 ax2.set_ylabel("정규화 값")
@@ -162,9 +152,7 @@ ax2.grid(alpha=0.3)
 
 # Z-점수 정규화
 ax3 = fig.add_subplot(3, 2, 3)
-for ticker, color in zip(tickers, colors):
-    zs = normalized_results[ticker]['zscore']
-    ax3.plot(zs.values, label=ticker, color=color, linewidth=1.2)
+ax3.plot(zs_vals, color='mediumseagreen', linewidth=1.2, label='Z-점수')
 ax3.axhline(0, linestyle='--', color='gray', linewidth=0.7)
 ax3.set_title("③ Z-점수 정규화 (μ=0, σ=1)")
 ax3.set_xlabel("거래일")
@@ -174,9 +162,7 @@ ax3.grid(alpha=0.3)
 
 # 로그 수익률
 ax4 = fig.add_subplot(3, 2, 4)
-for ticker, color in zip(tickers, colors):
-    lr = normalized_results[ticker]['logret']
-    ax4.plot(lr.values, label=ticker, color=color, linewidth=0.8, alpha=0.8)
+ax4.plot(lr_vals, color='darkorange', linewidth=0.8, alpha=0.85, label='로그수익률')
 ax4.axhline(0, linestyle='--', color='gray', linewidth=0.7)
 ax4.set_title("④ 로그 수익률 ln(P_t / P_{t-1})")
 ax4.set_xlabel("거래일")
@@ -186,13 +172,10 @@ ax4.grid(alpha=0.3)
 
 # 로그수익률 분포
 ax5 = fig.add_subplot(3, 2, 5)
-for ticker, color in zip(tickers, colors):
-    lr = normalized_results[ticker]['logret']
-    ax5.hist(lr.values, bins=40, alpha=0.5, color=color, label=ticker, edgecolor='none')
+ax5.hist(lr_vals, bins=50, alpha=0.7, color='darkorange', edgecolor='none')
 ax5.set_title("⑤ 로그수익률 분포 (정규분포에 가까울수록 좋음)")
 ax5.set_xlabel("로그 수익률")
 ax5.set_ylabel("빈도")
-ax5.legend(fontsize=8)
 ax5.grid(alpha=0.3)
 
 # 정규화 방법 비교 요약 텍스트
@@ -228,12 +211,12 @@ fig.text(0.5, 0.98,
 
 # ── 원본 패널 (ax1) ──
 ax1.text(0.5, -0.18,
-         '단위가 달라서 비교가 어려워요 (삼성=7만원, 애플=150달러)',
+         f'GS피앤엘({TICKER}) 실제 주가 — 정규화 전 원본',
          transform=ax1.transAxes, ha='center', fontsize=7, color='gray')
 
 # ── MinMax 패널 (ax2) ──
 ax2.text(0.5, -0.18,
-         '모두 0~1 사이로 맞춰서 같은 눈금으로 비교해요',
+         '0=역대 최저가, 1=역대 최고가 — AI 입력에 자주 사용',
          transform=ax2.transAxes, ha='center', fontsize=7, color='gray')
 
 # ── Z점수 패널 (ax3) ──
@@ -253,7 +236,7 @@ ax5.text(0.5, -0.18,
 
 plt.subplots_adjust(top=0.93)
 plt.tight_layout()
-ticker_tag = "_".join(t.replace(".", "_").replace("^", "") for t in list(raw_data.keys()))
+ticker_tag = TICKER.replace(".", "_")
 out_name = f"result/YfinanceNormalize_{ticker_tag}.png"
 plt.savefig(out_name, dpi=150, bbox_inches="tight")
 print(f"   → 그래프 저장: {out_name}")
