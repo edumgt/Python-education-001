@@ -27,7 +27,7 @@ torch.manual_seed(42)
 np.random.seed(42)
 
 # ── 1. 데이터 생성 ─────────────────────────────────────────
-print("\n[1/8] 주가 시계열 로드 중 (078935.KS - GS P&N)...")
+print("\n[1/8] 주가 시계열 로드 중 (078935.KS - GS피앤엘)...")
 time.sleep(0.5)
 
 TICKER = '078935.KS'
@@ -289,7 +289,9 @@ ax_txt.text(0.05, 1.04,
 
 plt.subplots_adjust(top=0.93)
 plt.tight_layout()
-plt.savefig("result/CnnLstmHybrid_078935_KS.png", dpi=150, bbox_inches="tight")
-print("   → 그래프 저장: result/CnnLstmHybrid_078935_KS.png")
+ticker_tag = TICKER.replace(".", "_")
+out_name = f"result/CnnLstmHybrid_{ticker_tag}.png"
+plt.savefig(out_name, dpi=150, bbox_inches="tight")
+print(f"   → 그래프 저장: {out_name}")
 
 print("\n✓ CNN+LSTM 하이브리드 주가 방향 분류 실습 완료!\n")

@@ -63,7 +63,7 @@ def ask_str(prompt, default):
     return default
 
 print()
-# 기본값: GS P&N (078935.KS), 윈도우 20일, 예측 5일, 스텝 1
+# 기본값: GS피앤엘 (078935.KS), 윈도우 20일, 예측 5일, 스텝 1
 TICKER  = args.ticker  if args.ticker  is not None else ask_str("   종목 티커", "078935.KS")
 WINDOW  = args.window  if args.window  is not None else ask_int("   윈도우 크기 (일)", 20, 5, 120)
 HORIZON = args.horizon if args.horizon is not None else ask_int("   예측 기간 (일)", 5, 1, 30)

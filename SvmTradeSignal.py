@@ -63,9 +63,9 @@ if prices_raw is not None and len(prices_raw) > 50:
 
     X = np.column_stack([momentum, vol_feat])
     buy_count = y.sum()
-    print(f"   → 실제 데이터 {len(X)}개 샘플 (GS P&N {TICKER})")
+    print(f"   → 실제 데이터 {len(X)}개 샘플 (GS피앤엘 {TICKER})")
     print(f"      매수 신호(1): {buy_count}개  |  매도/보류(0): {len(y) - buy_count}개")
-    data_source = f"GS P&N({TICKER}) 실제 데이터"
+    data_source = f"GS피앤엘({TICKER}) 실제 데이터"
 else:
     # ── fallback: 가상 데이터 ───────────────────────────────────────────────
     X = np.random.randn(240, 2)
@@ -172,8 +172,10 @@ def plot_signal_boundary(features, labels, clf):
     # ────────────────────────────────────────────────────────────────────────────
 
     plt.tight_layout()
-    plt.savefig("result/SvmTradeSignal_078935_KS.png", dpi=150, bbox_inches="tight")
-    print("   → 그래프 저장: result/SvmTradeSignal_078935_KS.png")
+    ticker_tag = TICKER.replace(".", "_")
+    out_name = f"result/SvmTradeSignal_{ticker_tag}.png"
+    plt.savefig(out_name, dpi=150, bbox_inches="tight")
+    print(f"   → 그래프 저장: {out_name}")
 
 
 plot_signal_boundary(X, y, model)

@@ -294,7 +294,9 @@ ax_acc.text(0.5, -0.22,
 
 plt.subplots_adjust(top=0.93)
 plt.tight_layout()
-plt.savefig("result/CnnCandleChart_078935_KS.png", dpi=150, bbox_inches="tight")
-print("   → 그래프 저장: result/CnnCandleChart_078935_KS.png")
+ticker_tag = TICKER.replace(".", "_")
+out_name = f"result/CnnCandleChart_{ticker_tag}.png"
+plt.savefig(out_name, dpi=150, bbox_inches="tight")
+print(f"   → 그래프 저장: {out_name}")
 
 print("\n✓ 2D CNN 캔들차트 이미지 분류 실습 완료!\n")

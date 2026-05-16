@@ -61,7 +61,7 @@ if prices_raw is not None and len(prices_raw) > 50:
     X = np.column_stack([feat_vol, feat_ret])  # [거래량변화율, 전일수익률]
     y = label
     print(f"   → 실제 데이터 샘플: {len(X)}개  |  특성: [거래량변화율, 전일수익률(%)]")
-    data_source = f"GS P&N({TICKER}) 실제 데이터"
+    data_source = f"GS피앤엘({TICKER}) 실제 데이터"
     x_label_str = "거래량 변화율"
 else:
     # ── fallback: 가상 데이터 ───────────────────────────────────────────────
@@ -154,7 +154,9 @@ fig.text(0.5, 0.995,
 # ────────────────────────────────────────────────────────────────────────────
 
 plt.tight_layout()
-plt.savefig("result/LinearRegressionReturn_078935_KS.png", dpi=150, bbox_inches="tight")
-print("   → 그래프 저장: result/LinearRegressionReturn_078935_KS.png")
+ticker_tag = TICKER.replace(".", "_")
+out_name = f"result/LinearRegressionReturn_{ticker_tag}.png"
+plt.savefig(out_name, dpi=150, bbox_inches="tight")
+print(f"   → 그래프 저장: {out_name}")
 
 print("\n✓ 선형 회귀 실습 완료!\n")
