@@ -74,7 +74,7 @@ if prices_raw is not None and len(prices_raw) > 50:
 
     n = len(rsi)
     print(f"   → 실제 데이터 {n}개 샘플  |  매수(1): {y.sum()}개  |  매도/관망(0): {(y == 0).sum()}개")
-    data_source = f"GS P&N({TICKER}) 실제 데이터"
+    data_source = f"GS피앤엘({TICKER}) 실제 데이터"
 else:
     # ── fallback: 가상 데이터 ───────────────────────────────────────────────
     n = 300
@@ -180,7 +180,9 @@ fig.text(0.5, 0.995, 'RSI·MACD 지표로 \'살까? 말까?\' 확률을 계산�
 # ────────────────────────────────────────────────────────────────────────────
 
 plt.tight_layout()
-plt.savefig("result/LogisticTradeSignal_078935_KS.png", dpi=150, bbox_inches="tight")
-print("   → 그래프 저장: result/LogisticTradeSignal_078935_KS.png")
+ticker_tag = TICKER.replace(".", "_")
+out_name = f"result/LogisticTradeSignal_{ticker_tag}.png"
+plt.savefig(out_name, dpi=150, bbox_inches="tight")
+print(f"   → 그래프 저장: {out_name}")
 
 print("\n✓ 로지스틱 회귀 실습 완료!\n")
