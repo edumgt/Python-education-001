@@ -3,6 +3,7 @@ import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import korean_font  # noqa: F401
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
@@ -14,18 +15,66 @@ print("=" * 55)
 print("  SVM: RSI/MACD 기반 시장 국면(상승/하락) 분류 실습")
 print("=" * 55)
 
-print("\n[1/5] 가상 기술지표 데이터 생성 중 (RSI, MACD, 거래량, 변동성)...")
+# ── 1. 실제 주가 데이터 로드 ───────────────────────────────
+print("\n[1/5] 주가 데이터 로드 & 기술지표 계산 중 (RSI, MACD, 변동성)...")
 time.sleep(0.5)
 np.random.seed(42)
-samples = 400
-rsi = np.random.uniform(20, 80, samples)
-macd = np.random.normal(0, 1.2, samples)
-volume_change = np.random.normal(0, 6, samples)
-volatility = np.random.uniform(0.5, 3.5, samples)
-X = np.column_stack([rsi, macd, volume_change, volatility])
-y = ((rsi > 50) & (macd > 0) & (volume_change > -1) & (volatility < 2.8)).astype(int)
-print(f"   → {samples}개 샘플 생성")
-print(f"      상승장(1): {y.sum()}개  |  하락장(0): {(y == 0).sum()}개")
+TICKER = '078935.KS'
+prices_raw = None
+try:
+    import yfinance as yf
+    from datetime import date
+    df = yf.download(TICKER, start='2020-01-01', end=date.today().isoformat(),
+                     auto_adjust=True, progress=False)
+    if len(df) > 50:
+        prices_raw = df['Close'].squeeze().dropna().values.flatten().astype(np.float32)
+        print(f"   ✓ {TICKER}: {len(prices_raw)}일 실제 데이터 로드")
+except Exception as e:
+    print(f"   yfinance 오류 ({e}) → 가상 데이터 사용")
+
+if prices_raw is None:
+    days = 500
+    t = np.arange(days, dtype=float)
+    prices_raw = (100 + 0.1 * t + 10 * np.sin(t / 40) + np.random.normal(0, 2, days)).astype(np.float32)
+    print(f"   → 가상 {days}일치 주가 생성")
+
+
+def compute_rsi(prices, n=14):
+    s = pd.Series(prices.astype(float))
+    delta = s.diff()
+    gain = delta.clip(lower=0).rolling(n).mean()
+    loss = (-delta.clip(upper=0)).rolling(n).mean()
+    rs = gain / loss.replace(0, 1e-8)
+    return (100 - 100 / (1 + rs)).values
+
+
+def compute_macd(prices, fast=12, slow=26):
+    s = pd.Series(prices.astype(float))
+    return (s.ewm(span=fast).mean() - s.ewm(span=slow).mean()).values
+
+
+def compute_volatility(prices, n=10):
+    s = pd.Series(prices.astype(float))
+    return s.pct_change().rolling(n).std().values
+
+
+rsi_vals  = compute_rsi(prices_raw)
+macd_vals = compute_macd(prices_raw)
+vol_vals  = compute_volatility(prices_raw)
+
+# 다음 날 수익률 기반 레이블 (1=상승, 0=하락)
+returns = np.diff(prices_raw) / prices_raw[:-1]
+labels  = (returns > 0).astype(int)
+
+# NaN 제거 (첫 ~26일은 MACD 계산 불가)
+valid_idx = ~(np.isnan(rsi_vals[:-1]) | np.isnan(macd_vals[:-1]) | np.isnan(vol_vals[:-1]))
+rsi_v   = rsi_vals[:-1][valid_idx]
+macd_v  = macd_vals[:-1][valid_idx]
+vol_v   = vol_vals[:-1][valid_idx]
+y       = labels[valid_idx]
+
+X = np.column_stack([rsi_v, macd_v, vol_v])
+print(f"   → {len(X)}개 샘플  |  상승장(1): {y.sum()}개  |  하락장(0): {(y==0).sum()}개")
 time.sleep(0.5)
 
 print("\n[2/5] 학습/테스트 세트 분리 중 (8:2)...")
@@ -59,7 +108,7 @@ preds = y_pred[:40]
 colors = np.where(preds == 1, 'tomato', 'royalblue')
 fig, ax = plt.subplots(figsize=(7, 4))
 ax.scatter(points[:, 0], points[:, 1], c=colors, alpha=0.7)
-ax.set_title("RSI-MACD 기반 시장 국면 예측")
+ax.set_title(f"RSI-MACD 기반 시장 국면 예측 ({TICKER})")
 ax.set_xlabel("RSI")
 ax.set_ylabel("MACD")
 
@@ -101,7 +150,9 @@ fig.text(0.5, 0.995, 'RSI와 MACD 두 지표로 지금 시장이 오르는 중�
 # ────────────────────────────────────────────────────────────────────────────
 
 plt.tight_layout()
-plt.savefig("result/SvmMarketPhase.png", dpi=150, bbox_inches="tight")
-print("   → 그래프 저장: result/SvmMarketPhase.png")
+ticker_tag = TICKER.replace('.', '_')
+out_name = f"result/SvmMarketPhase_{ticker_tag}.png"
+plt.savefig(out_name, dpi=150, bbox_inches="tight")
+print(f"   → 그래프 저장: {out_name}")
 
 print("\n✓ SVM 시장 국면 분류 실습 완료!\n")

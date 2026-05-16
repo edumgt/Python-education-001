@@ -68,6 +68,9 @@ TOTAL_LEN  = N_WINDOWS * WIN_SIZE  # = 60일
 X_list, y_list = [], []
 for i in range(len(returns) - TOTAL_LEN):
     seq = returns[i:i + TOTAL_LEN]                         # (60,)
+    # 윈도우별 z-score 정규화: 패턴을 더 선명하게
+    mu, sigma = seq.mean(), seq.std() + 1e-8
+    seq = (seq - mu) / sigma
     windows = seq.reshape(N_WINDOWS, WIN_SIZE)             # (6, 10)
     X_list.append(windows)
     y_list.append(1 if returns[i + TOTAL_LEN] > 0 else 0)
@@ -103,11 +106,11 @@ class CnnLstmHybrid(nn.Module):
 
         # CNN 인코더: 각 윈도우(길이=win_size)의 로컬 패턴 추출
         self.cnn = nn.Sequential(
-            nn.Conv1d(1, 16, kernel_size=3, padding=1),   # (B*n, 16, win)
+            nn.Conv1d(1, 16, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.Conv1d(16, cnn_out, kernel_size=3, padding=1),  # (B*n, 32, win)
+            nn.Conv1d(16, cnn_out, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.AdaptiveAvgPool1d(1),                       # (B*n, 32, 1)
+            nn.AdaptiveAvgPool1d(1),
         )
 
         # LSTM: CNN이 추출한 n_windows개 특징 벡터를 순서대로 처리
@@ -137,19 +140,19 @@ class CnnLstmHybrid(nn.Module):
         return self.classifier(out)           # (B, 2)
 
 
-model = CnnLstmHybrid(WIN_SIZE, N_WINDOWS)
+model = CnnLstmHybrid(WIN_SIZE, N_WINDOWS, cnn_out=32, lstm_hidden=64)
 total_params = sum(p.numel() for p in model.parameters())
 print(f"   → 총 파라미터: {total_params:,}개")
 time.sleep(0.4)
 
 # ── 5. 학습 설정 ───────────────────────────────────────────
-print("\n[5/8] 학습 설정 중 (CrossEntropy + Adam + 학습률 스케줄러)...")
+print("\n[5/8] 학습 설정 중 (LabelSmoothing + Adam + 학습률 스케줄러)...")
 time.sleep(0.4)
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1)  # 과자신감 방지
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100)
-EPOCHS, BATCH = 120, 32
-print(f"   → 에폭={EPOCHS}  배치={BATCH}  손실=CrossEntropy")
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=60)
+EPOCHS, BATCH = 60, 32
+print(f"   → 에폭={EPOCHS}  배치={BATCH}  손실=CrossEntropy+LabelSmoothing(0.1)")
 time.sleep(0.3)
 
 # ── 6. 학습 루프 ──────────────────────────────────────────
@@ -179,13 +182,13 @@ for epoch in range(EPOCHS):
     avg_acc  = ep_correct / len(X_train)
     loss_hist.append(avg_loss)
     acc_hist.append(avg_acc)
-    if epoch % 30 == 0:
+    if epoch % 15 == 0:
         trend = " ↓" if (prev_loss and avg_loss < prev_loss) else ""
         print(f"   Epoch {epoch:4d} | Loss: {avg_loss:.4f}{trend}  Acc: {avg_acc:.4f}")
         prev_loss = avg_loss
         time.sleep(0.2)
 
-print(f"   Epoch {EPOCHS:4d} | 학습 완료!")
+print(f"   Epoch  {EPOCHS:3d} | 학습 완료!")
 time.sleep(0.4)
 
 # ── 7. 테스트 평가 ─────────────────────────────────────────
@@ -224,13 +227,17 @@ ax2.set_ylabel("정확도")
 ax2.legend()
 ax2.grid(alpha=0.3)
 
-# 테스트 예측 확률
+# 테스트 예측 확률 (중앙값 기준으로 색 분류 — 항상 빨강/파랑 섞임)
 ax3 = fig.add_subplot(2, 1, 2)
 n_show = min(80, len(probs))
-colors = ['tomato' if p >= 0.5 else 'royalblue' for p in probs[:n_show]]
+prob_median = float(np.median(probs[:n_show]))
+colors = ['tomato' if p >= prob_median else 'royalblue' for p in probs[:n_show]]
 ax3.bar(range(n_show), probs[:n_show], color=colors, alpha=0.8, edgecolor='k', linewidth=0.2)
-ax3.axhline(0.5, linestyle='--', color='black', linewidth=0.8)
-ax3.set_title(f"테스트 상승 예측 확률 — 빨강=상승예측 / 파랑=하락예측 (정확도={acc_test:.2f})")
+ax3.axhline(0.5, linestyle=':', color='gray', linewidth=0.8, label='0.5 기준선')
+ax3.axhline(prob_median, linestyle='--', color='black', linewidth=1.0,
+            label=f'중앙값={prob_median:.3f} (색 기준)')
+ax3.legend(fontsize=7)
+ax3.set_title(f"테스트 상승 예측 확률 — 빨강=중앙값 이상 / 파랑=중앙값 미만 (정확도={acc_test:.2f})")
 ax3.set_xlabel("테스트 샘플")
 ax3.set_ylabel("상승 확률")
 
@@ -239,7 +246,8 @@ ax_txt = fig.add_axes([0.01, 0.52, 0.22, 0.44])
 ax_txt.axis('off')
 struct = (
     "CNN+LSTM 구조\n\n"
-    f"입력: (배치, {N_WINDOWS}, {WIN_SIZE})\n\n"
+    f"입력: z-score 정규화\n"
+    f"(배치, {N_WINDOWS}, {WIN_SIZE})\n\n"
     "① Conv1d(1→16, k=3)\n"
     "   ReLU\n"
     "② Conv1d(16→32, k=3)\n"
@@ -249,7 +257,8 @@ struct = (
     f"④ LSTM(32→64)\n"
     f"   num_layers=2\n"
     f"   Dropout=0.3\n\n"
-    f"⑤ Linear(64→2)\n\n"
+    f"⑤ Linear(64→2)\n"
+    f"   LabelSmoothing=0.1\n\n"
     f"파라미터: {total_params:,}개"
 )
 ax_txt.text(0.05, 0.95, struct, transform=ax_txt.transAxes,
@@ -277,10 +286,10 @@ ax2.text(0.5, -0.18,
          transform=ax2.transAxes, ha='center', fontsize=7, color='gray')
 
 # ── 예측확률 패널 (ax3) ──
-ax3.text(0.12, 0.88, '상승 예측', transform=ax3.transAxes,
-         fontsize=8, color='tomato', ha='center')
-ax3.text(0.35, 0.20, '하락 예측', transform=ax3.transAxes,
-         fontsize=8, color='royalblue', ha='center')
+ax3.text(0.10, 0.88, '상대적 상승 예측\n(중앙값 이상)', transform=ax3.transAxes,
+         fontsize=7, color='tomato', ha='center')
+ax3.text(0.80, 0.15, '상대적 하락 예측\n(중앙값 미만)', transform=ax3.transAxes,
+         fontsize=7, color='royalblue', ha='center')
 
 # ── 구조 텍스트 박스 위 설명 ──
 ax_txt.text(0.05, 1.04,

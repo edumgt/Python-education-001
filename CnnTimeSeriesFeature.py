@@ -62,7 +62,10 @@ time.sleep(0.5)
 SEQ_LEN = 30
 X_list, y_list = [], []
 for i in range(len(returns) - SEQ_LEN):
-    X_list.append(returns[i:i + SEQ_LEN])
+    seq = returns[i:i + SEQ_LEN]
+    mu, sigma = seq.mean(), seq.std() + 1e-8
+    seq = (seq - mu) / sigma          # 윈도우별 z-score 정규화
+    X_list.append(seq)
     y_list.append(1 if returns[i + SEQ_LEN] > 0 else 0)
 
 X_all = np.array(X_list, dtype=np.float32)  # (N, 30)
@@ -105,7 +108,7 @@ class CNN1DStock(nn.Module):
             nn.Flatten(),
             nn.Linear(64 * 4, 64),
             nn.ReLU(),
-            nn.Dropout(0.3),
+            nn.Dropout(0.4),
             nn.Linear(64, 2),
         )
 
@@ -128,12 +131,12 @@ time.sleep(0.5)
 # ── 4. 학습 설정 ───────────────────────────────────────────
 print("\n[4/8] 학습 설정 중 (CrossEntropy + Adam)...")
 time.sleep(0.4)
-criterion  = nn.CrossEntropyLoss()
-optimizer  = torch.optim.Adam(model.parameters(), lr=0.001)
-scheduler  = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100)
-EPOCHS     = 150
+criterion  = nn.CrossEntropyLoss(label_smoothing=0.1)
+optimizer  = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=2e-4)
+scheduler  = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=60)
+EPOCHS     = 60
 BATCH_SIZE = 64
-print(f"   → 에폭={EPOCHS}  배치={BATCH_SIZE}  손실=CrossEntropy")
+print(f"   → 에폭={EPOCHS}  배치={BATCH_SIZE}  손실=CrossEntropy+LabelSmoothing")
 time.sleep(0.3)
 
 # ── 5. 학습 ───────────────────────────────────────────────
@@ -163,7 +166,7 @@ for epoch in range(EPOCHS):
     loss_hist.append(avg_loss)
     acc_hist.append(avg_acc)
 
-    if epoch % 30 == 0:
+    if epoch % 15 == 0:
         trend = " ↓" if (prev_loss and avg_loss < prev_loss) else ""
         print(f"   Epoch {epoch:4d} | Loss: {avg_loss:.4f}{trend}  Acc: {avg_acc:.4f}")
         prev_loss = avg_loss
@@ -226,12 +229,17 @@ ax2.set_ylabel("정확도")
 ax2.legend()
 ax2.grid(alpha=0.3)
 
-# 테스트 예측 확률
+# 테스트 예측 확률 (중앙값 기준으로 색 분류)
 ax3 = fig.add_subplot(3, 1, 2)
-colors = ['tomato' if p >= 0.5 else 'royalblue' for p in probs[:60]]
-ax3.bar(range(60), probs[:60], color=colors, alpha=0.8, edgecolor='k', linewidth=0.2)
-ax3.axhline(0.5, linestyle='--', color='black', linewidth=0.8)
-ax3.set_title(f"테스트 샘플 상승 예측 확률 (정확도={acc_test:.2f})")
+n_show = min(60, len(probs))
+prob_median = float(np.median(probs[:n_show]))
+colors = ['tomato' if p >= prob_median else 'royalblue' for p in probs[:n_show]]
+ax3.bar(range(n_show), probs[:n_show], color=colors, alpha=0.8, edgecolor='k', linewidth=0.2)
+ax3.axhline(0.5, linestyle=':', color='gray', linewidth=0.8, label='0.5 기준선')
+ax3.axhline(prob_median, linestyle='--', color='black', linewidth=1.0,
+            label=f'중앙값={prob_median:.3f} (색 기준)')
+ax3.legend(fontsize=7)
+ax3.set_title(f"테스트 샘플 상승 예측 확률 — 빨강=중앙값 이상 / 파랑=중앙값 미만 (정확도={acc_test:.2f})")
 ax3.set_xlabel("테스트 샘플")
 ax3.set_ylabel("상승 확률")
 
@@ -268,11 +276,11 @@ ax2.annotate('이 수준이면 좋아요', xy=(0.9, 0.85), xytext=(0.55, 0.75),
              arrowprops=dict(arrowstyle='->', color='gray'), fontsize=7, color='#333')
 
 # ── 예측확률 패널 (ax3) ──
-ax3.text(0.15, 0.88, '상승 예측', transform=ax3.transAxes,
-         fontsize=8, color='tomato', ha='center')
-ax3.text(0.35, 0.25, '하락 예측', transform=ax3.transAxes,
-         fontsize=8, color='royalblue', ha='center')
-ax3.text(0.5, -0.14, '기준: 이 위=상승 예측, 아래=하락 예측 (점선=0.5)',
+ax3.text(0.10, 0.88, '상대적 상승 예측\n(중앙값 이상)', transform=ax3.transAxes,
+         fontsize=7, color='tomato', ha='center')
+ax3.text(0.80, 0.15, '상대적 하락 예측\n(중앙값 미만)', transform=ax3.transAxes,
+         fontsize=7, color='royalblue', ha='center')
+ax3.text(0.5, -0.14, '주가 방향은 예측이 어려워 확률이 0.5 근처에 몰립니다 — 중앙값 기준으로 색 구분',
          transform=ax3.transAxes, ha='center', fontsize=7, color='gray')
 
 # ── 특징맵 패널 (ax4) ──

@@ -107,7 +107,7 @@ def candle_to_image(o, h, l, c, size=IMG_SIZE):
     fig.canvas.draw()
     buf = np.frombuffer(fig.canvas.buffer_rgba(), dtype=np.uint8)
     w, h_px = fig.canvas.get_width_height()
-    img = buf.reshape(h_px, w, 4)[:, :, :3].mean(axis=2)  # RGBA → RGB → 그레이
+    img = buf.reshape(h_px, w, 4)[:, :, :3]  # RGBA → RGB (컬러 유지)
     plt.close(fig)
     # size×size 리샘플
     from PIL import Image as PILImage
@@ -137,7 +137,7 @@ for i in range(0, total, 3):   # 3일 간격으로 샘플링
         print(f"   {len(images)}/{total // 3 + 1} 이미지 생성 중...")
         time.sleep(0.05)
 
-images = np.array(images, dtype=np.float32)  # (N, 32, 32)
+images = np.array(images, dtype=np.float32)  # (N, 32, 32, 3)
 labels = np.array(labels, dtype=np.int64)
 print(f"   → 총 {len(images)}장 생성  |  상승: {labels.sum()}장  하락: {(labels==0).sum()}장")
 time.sleep(0.3)
@@ -145,7 +145,7 @@ time.sleep(0.3)
 # ── 4. Tensor 변환 & 분할 ─────────────────────────────────
 print("\n[4/8] Tensor 변환 & 학습/테스트 분리 중 (8:2)...")
 time.sleep(0.4)
-X_tensor = torch.tensor(images).unsqueeze(1)  # (N, 1, 32, 32)
+X_tensor = torch.tensor(images).permute(0, 3, 1, 2)  # (N, 3, 32, 32)
 y_tensor = torch.tensor(labels)
 split = int(len(X_tensor) * 0.8)
 X_train, X_test = X_tensor[:split], X_tensor[split:]
@@ -155,7 +155,7 @@ time.sleep(0.3)
 
 # ── 5. 2D CNN 모델 ─────────────────────────────────────────
 print("\n[5/8] 2D CNN 모델 정의 중...")
-print("   Conv2d(1→16, 3×3)  : 이미지의 2D 패턴(캔들 형태) 감지")
+print("   Conv2d(3→16, 3×3)  : RGB 3채널 이미지의 2D 패턴(캔들 형태) 감지")
 print("   Conv2d(16→32, 3×3) : 더 복잡한 복합 패턴 감지")
 print("   GlobalAvgPool → FC : 위치 무관하게 패턴 집계 → 분류")
 time.sleep(0.5)
@@ -165,7 +165,7 @@ class CNN2DCandle(nn.Module):
     def __init__(self):
         super().__init__()
         self.features = nn.Sequential(
-            nn.Conv2d(1, 16, 3, padding=1), nn.BatchNorm2d(16), nn.ReLU(),
+            nn.Conv2d(3, 16, 3, padding=1), nn.BatchNorm2d(16), nn.ReLU(),
             nn.MaxPool2d(2),                                      # 32→16
             nn.Conv2d(16, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(),
             nn.MaxPool2d(2),                                      # 16→8
@@ -240,7 +240,7 @@ fig = plt.figure(figsize=(14, 10))
 # 샘플 캔들 이미지 6장
 for i in range(6):
     ax = fig.add_subplot(3, 4, i + 1)
-    ax.imshow(images[i * 20], cmap='gray', vmin=0, vmax=1)
+    ax.imshow(images[i * 20])
     label_str = "상승▲" if labels[i * 20] == 1 else "하락▼"
     color = 'red' if labels[i * 20] == 1 else 'blue'
     ax.set_title(f"샘플{i + 1}: {label_str}", color=color, fontsize=9)
