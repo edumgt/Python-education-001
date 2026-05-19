@@ -1,12 +1,275 @@
 # Python 주식투자 머신러닝 실습 커리큘럼
 
-이 저장소는 Python 기초부터 머신러닝/딥러닝까지 **주식투자 데이터 분석** 중심으로 학습하도록 구성되어 있습니다.
+> Python 기초부터 Transformer 딥러닝까지 — **주식투자 데이터 분석**을 주제로 단계별로 학습합니다.
 
 ---
 
-# 딥러닝(DL)과 머신러닝(ML)의 작동 원리 이해
+## 📁 프로젝트 구조
 
-## 1. 머신러닝/딥러닝의 알고리즘은 모두 오차를 줄이기 위한 것인가?
+```
+python-ml-class/
+├── src/                    ← 모든 Python 실습 파일
+│   ├── korean_font.py      ← 한글 폰트 유틸리티 (모든 파일이 공통 사용)
+│   ├── NumpyStockArray.py
+│   ├── PandasPortfolio.py
+│   ├── ... (총 23개)
+│
+├── docs/                   ← 각 소스 파일의 초등학생 수준 설명 문서
+│   ├── NumpyStockArray.md
+│   ├── PandasPortfolio.md
+│   ├── ... (총 23개)
+│
+├── result/                 ← 실행 후 자동 저장되는 PNG + MD 분석 파일
+│   ├── NumpyStockArray.png
+│   ├── NumpyStockArray.md
+│   ├── ... (총 44개)
+│
+├── requirements.txt        ← 필요한 라이브러리 목록
+└── Readme.md               ← 이 파일
+```
+
+---
+
+## 🚀 빠른 시작 (Quick Start)
+
+### 1단계: 환경 요구사항
+
+| 항목 | 권장 버전 |
+|------|----------|
+| Python | 3.10 이상 |
+| OS | Ubuntu 20.04+ / macOS 12+ / Windows 10+ (WSL2 권장) |
+| RAM | 4GB 이상 (딥러닝 파일은 8GB 권장) |
+| 인터넷 | yfinance 데이터 다운로드에 필요 |
+
+### 2단계: 설치
+
+```bash
+# 1) 저장소 복제
+git clone <repo-url>
+cd python-ml-class
+
+# 2) 가상환경 생성 및 활성화
+python3 -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+# 3) 라이브러리 설치
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 4) 한글 폰트 설치 (Linux/Ubuntu)
+sudo apt install fonts-nanum -y
+```
+
+### 3단계: 첫 번째 실행 (5분 소요)
+
+```bash
+cd src
+python NumpyStockArray.py
+```
+
+실행 후 `result/NumpyStockArray.png` 파일이 생성됩니다.
+
+---
+
+## 📚 학습 로드맵
+
+아래 순서대로 실습하면 **기초 → 중급 → 고급** 순으로 체계적으로 학습할 수 있습니다.
+
+### 🟢 1단계: Python 기초 & 데이터 처리 (입문)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 1 | `korean_font.py` | 한글 폰트 유틸리티 — import 구조 이해 | 10분 |
+| 2 | `NumpyStockArray.py` | NumPy 배열 연산, 수익률/변동성 계산 | 20분 |
+| 3 | `PandasPortfolio.py` | Pandas DataFrame, 결측치 처리, groupby | 20분 |
+| 4 | `YfinanceNormalize.py` | 실제 주가 다운로드, Min-Max/Z-점수/로그수익률 | 25분 |
+
+> 💡 **학습 포인트:** 브로드캐스팅, 슬라이싱, fillna, 정규화의 필요성
+
+---
+
+### 🔵 2단계: 머신러닝 기초 — 회귀 & 분류 (초급)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 5 | `LinearRegressionFundamental.py` | 선형 회귀: PER/PBR/ROE → 기대 수익률 | 25분 |
+| 6 | `LinearRegressionReturn.py` | 선형 회귀: 과거 5일 수익률 → 미래 5일 예측 | 30분 |
+| 7 | `LogisticTradeSignal.py` | 로지스틱 회귀: RSI/MACD → 매수/매도 분류 | 30분 |
+
+> 💡 **학습 포인트:** 지도 학습, 오차 함수(MAE/MSE), 결정 경계, 시그모이드
+
+---
+
+### 🔵 3단계: 머신러닝 심화 — SVM & 비지도 학습 (초급~중급)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 8 | `SvmTradeSignal.py` | SVM 선형 커널: 매매 신호 분류 | 30분 |
+| 9 | `SvmMarketPhase.py` | SVM RBF 커널: 시장 국면(상승/하락) 분류 | 30분 |
+| 10 | `KMeansStockCluster.py` | K-Means: 종목 자동 군집화 | 25분 |
+| 11 | `PcaStockReduce.py` | PCA: 6차원 → 2차원 차원 축소 | 25분 |
+| 12 | `HyperparamTuning.py` | Grid Search, K-Fold, 과적합/Dropout 실험 | 40분 |
+
+> 💡 **학습 포인트:** 마진 최대화, RBF 커널, centroid, 주성분, 교차검증
+
+---
+
+### 🟡 4단계: 시계열 분석 & ARIMA (중급)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 13 | `TimeSeriesAnalysis.py` | 이동평균, 볼린저밴드, ACF/PACF, ADF 정상성 검정 | 35분 |
+| 14 | `ArimaStockForecast.py` | ARIMA(2,1,2): 1개월 미래 주가 예측 | 35분 |
+| 15 | `HeatmapRiskMask.py` | 히트맵 & 마스킹: 고위험 구간 탐지 | 20분 |
+
+> 💡 **학습 포인트:** 정상성, 차분, AR/MA 차수, AIC, 95% 신뢰 구간
+
+---
+
+### 🟠 5단계: 딥러닝 기초 — 신경망 직접 구현 (중급)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 16 | `NeuralNetBackprop.py` | NumPy만으로 역전파 직접 구현 | 45분 |
+| 17 | `RnnBackprop.py` | 바닐라 RNN + BPTT 직접 구현 | 45분 |
+
+> 💡 **학습 포인트:** 순전파/역전파, 체인룰, BPTT, 기울기 소실
+
+---
+
+### 🟠 6단계: PyTorch 딥러닝 (중급~고급)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 18 | `LstmStockPyTorch.py` | LSTM: 20일 → 다음 날 주가 예측 | 45분 |
+| 19 | `TimeSeriesWindow.py` | CLI LSTM: 종목·윈도우·기간 자유 설정 | 40분 |
+| 20 | `CnnTimeSeriesFeature.py` | 1D CNN: 수익률 시퀀스 패턴 추출 | 40분 |
+| 21 | `CnnCandleChart.py` | 2D CNN: 캔들차트 이미지 분류 | 45분 |
+| 22 | `CnnLstmHybrid.py` | CNN + LSTM 하이브리드 | 45분 |
+
+> 💡 **학습 포인트:** 셀 상태, 게이트, Conv1d/Conv2d, 슬라이딩 윈도우
+
+---
+
+### 🔴 7단계: Transformer (고급)
+
+| 순서 | 파일 | 주제 | 예상 시간 |
+|------|------|------|----------|
+| 23 | `TransformerAttention.py` | Multi-Head Self-Attention: 방향 분류 & Attention 히트맵 | 60분 |
+
+> 💡 **학습 포인트:** Q/K/V, Positional Encoding, Attention 가중치 시각화
+
+---
+
+## ▶️ 파일별 실행 가이드
+
+모든 파일은 `src/` 폴더에서 실행합니다.
+
+```bash
+cd src
+```
+
+### 기본 실행 (대부분의 파일)
+
+```bash
+python ArimaStockForecast.py
+python CnnCandleChart.py
+python HyperparamTuning.py
+# ... 파일명만 바꾸면 동일하게 실행
+```
+
+### CLI 인자를 받는 파일
+
+**TimeSeriesWindow.py** — 종목·윈도우·예측기간 설정 가능
+
+```bash
+# 기본값: GS피앤엘(078935.KS), 윈도우=20일, 예측=5일
+python TimeSeriesWindow.py
+
+# 삼성전자, 윈도우 30일, 10일 후 예측
+python TimeSeriesWindow.py --ticker 005930.KS --window 30 --horizon 10
+
+# 애플, 미국 주식
+python TimeSeriesWindow.py --ticker AAPL --window 20 --horizon 5
+```
+
+### 실행 결과 확인
+
+모든 파일 실행 후 **`result/`** 폴더에 PNG 이미지가 저장됩니다.
+
+```bash
+ls ../result/          # 생성된 파일 목록 확인
+```
+
+---
+
+## 📖 학습 자료 활용법
+
+### `docs/` 폴더 — 코드를 초등학생 언어로 설명한 문서
+
+각 Python 파일에 대응하는 마크다운 파일이 있습니다.
+
+```
+docs/NumpyStockArray.md     ← NumpyStockArray.py 의 코드 설명
+docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
+...
+```
+
+**활용 방법:**
+1. `docs/[파일명].md` 를 먼저 읽어서 전체 흐름을 파악합니다.
+2. 실제 `src/[파일명].py` 소스를 열어 코드를 확인합니다.
+3. 코드를 직접 실행해 `result/` 폴더에 그래프를 생성합니다.
+4. `result/[파일명].md` 를 읽어 결과 해석 방법을 확인합니다.
+
+### `result/` 폴더 — 실행 결과 PNG + 분석 가이드
+
+| 파일 패턴 | 설명 |
+|----------|------|
+| `[파일명].png` | 시각화 결과 이미지 |
+| `[파일명]_078935_KS.png` | GS피앤엘 실제 주가 기반 결과 |
+| `[파일명].md` | 그래프 읽는 법 + 모델 해석 가이드 |
+
+---
+
+## 💡 실습 팁 & 심화 과제
+
+### 기본 실습 후 해볼 수 있는 심화 과제
+
+**1단계 심화**
+- `NumpyStockArray.py`: 종목을 10개로 늘리고 샤프 비율(평균수익률/변동성)을 계산해보세요.
+- `YfinanceNormalize.py`: 삼성전자(`005930.KS`)로 종목을 바꿔서 비교해보세요.
+
+**2단계 심화**
+- `LinearRegressionReturn.py`: lookback 기간을 5일 → 10일로 바꾸면 R²가 개선되는지 확인해보세요.
+- `LogisticTradeSignal.py`: 임계값(threshold)을 0.5 → 0.6으로 높이면 정밀도가 어떻게 변하는지 관찰해보세요.
+
+**3단계 심화**
+- `HyperparamTuning.py`: C 범위를 `[0.001, 0.01, 0.1, 1, 10, 100, 1000]`으로 넓혀 최적값을 찾아보세요.
+- `KMeansStockCluster.py`: k=4, k=5로 바꾸면 군집이 어떻게 달라지는지 비교해보세요.
+
+**4단계 심화**
+- `ArimaStockForecast.py`: `p=1, q=1`과 `p=3, q=3`으로 AIC를 비교해보세요.
+
+**5~7단계 심화**
+- `LstmStockPyTorch.py`: `SEQ_LEN=20` → `SEQ_LEN=60`으로 바꿔 성능 변화를 확인해보세요.
+- `TimeSeriesWindow.py`: 여러 종목(`AAPL`, `005930.KS`, `078935.KS`)을 비교 실험해보세요.
+- `TransformerAttention.py`: `d_model=32, nhead=4`로 키워서 Attention 패턴 변화를 관찰해보세요.
+
+### 디버깅 체크리스트
+
+```
+✅ yfinance 데이터 오류 → 인터넷 연결 및 종목 코드 확인 (KS종목은 .KS 붙이기)
+✅ 한글 깨짐 → sudo apt install fonts-nanum 후 재실행
+✅ CUDA 오류 → torch.device('cpu')로 강제 변경
+✅ ModuleNotFoundError → pip install -r requirements.txt 재실행
+✅ result/ 폴더 없음 → src/ 폴더 안에서 실행하고 있는지 확인
+```
+
+---
+
+## 📘 딥러닝(DL)과 머신러닝(ML)의 작동 원리 이해
+
+### 1. 머신러닝/딥러닝의 알고리즘은 모두 오차를 줄이기 위한 것인가?
 
 결론부터 말하자면, **대부분 맞습니다.**
 
@@ -22,7 +285,7 @@
 
 ---
 
-### ① 지도 학습 (Supervised Learning): 정답지가 있는 공부
+#### ① 지도 학습 (Supervised Learning): 정답지가 있는 공부
 
 * **대상:** 선형 회귀, 로지스틱 회귀, 이미지 분류 딥러닝 등
 * **원리:** 모델이 예측한 값과 실제 정답을 비교해 오차를 줄입니다.
@@ -37,7 +300,7 @@
 
 ---
 
-### ② 비지도 학습 (Unsupervised Learning): 정답지 없이 스스로 분류
+#### ② 비지도 학습 (Unsupervised Learning): 정답지 없이 스스로 분류
 
 * **대상:** 군집화(Clustering), 차원 축소(PCA) 등
 * **원리:** 정답 없이 데이터 안에서 비슷한 것끼리 묶거나 패턴을 찾습니다.
@@ -50,7 +313,7 @@
 
 ---
 
-### ③ 강화 학습 (Reinforcement Learning): 게임처럼 점수를 높이기
+#### ③ 강화 학습 (Reinforcement Learning): 게임처럼 점수를 높이기
 
 * **대상:** 알파고, 자율주행 등
 * **원리:** 행동할 때마다 점수(보상)를 받고, 점수를 최대로 높이는 전략을 배웁니다.
@@ -63,7 +326,7 @@
 
 ---
 
-## 2. 딥러닝(DL)은 선형회귀를 순차·역순차로 계속 반복하는 것인가?
+### 2. 딥러닝(DL)은 선형회귀를 순차·역순차로 계속 반복하는 것인가?
 
 **정확한 핵심입니다!**
 
@@ -71,7 +334,7 @@
 
 ---
 
-### ① '선형 회귀'를 거대하게 쌓기 (인공신경망)
+#### ① '선형 회귀'를 거대하게 쌓기 (인공신경망)
 
 선형 회귀의 기본 공식:
 $$\text{Output} = WX + b$$
@@ -91,7 +354,7 @@ $$\text{Output} = WX + b$$
 
 ---
 
-### ② '앞으로' 계산하기: 순전파 (Forward Propagation)
+#### ② '앞으로' 계산하기: 순전파 (Forward Propagation)
 
 * **방향:** 입력층 → 은닉층 → 출력층 (앞으로 전진)
 * **역할:** 입력 데이터를 받아 최종 예측값을 만들고, 정답과 비교해 오차를 계산합니다.
@@ -102,7 +365,7 @@ $$\text{Output} = WX + b$$
 
 ---
 
-### ③ '뒤로' 고치기: 역전파 (Backpropagation)
+#### ③ '뒤로' 고치기: 역전파 (Backpropagation)
 
 * **방향:** 출력층 → 은닉층 → 입력층 (뒤로 후진)
 * **역할:** 오차를 거꾸로 추적하며 각 계산 단위가 얼마나 틀림에 기여했는지 파악하고, 가중치를 조금씩 수정합니다.
@@ -113,7 +376,7 @@ $$\text{Output} = WX + b$$
 
 ---
 
-### ④ 무한 반복 (Epoch / Iteration)
+#### ④ 무한 반복 (Epoch / Iteration)
 
 순전파(문제 풀기)와 역전파(오답 노트)를 수천, 수만 번 반복하면서 최적의 예측 모델이 완성됩니다.
 
@@ -124,7 +387,7 @@ $$\text{Output} = WX + b$$
 
 ---
 
-## 요약
+### 요약
 
 | 개념 | 쉬운 비유 |
 |------|----------|
@@ -141,120 +404,109 @@ $$\text{Output} = WX + b$$
 
 ---
 
-## 파일별 설명
+## 파일별 요약 설명
 
 ### 1) 기초 데이터 처리
 
-- [NumpyStockArray.py](NumpyStockArray.py): 주가 배열, 수익률/변동성 계산, 포트폴리오 기대수익률
-  > 예시: "삼성전자가 100일 동안 어떻게 올랐나?" 를 숫자 배열로 계산합니다.
+- [NumpyStockArray.py](src/NumpyStockArray.py): 주가 배열, 수익률/변동성 계산, 포트폴리오 기대수익률
+  > 예시: "5종목이 8일 동안 어떻게 올랐나?" 를 숫자 배열로 계산합니다.
 
-- [PandasPortfolio.py](PandasPortfolio.py): 포트폴리오 결측치 처리, 평가금액/수익률 계산, 섹터별 집계
-  > 예시: 주식 거래 기록표에서 빠진 날짜를 채우고, 내 수익률을 표로 정리합니다.
+- [PandasPortfolio.py](src/PandasPortfolio.py): 포트폴리오 결측치 처리, 평가금액/수익률 계산, 섹터별 집계
+  > 예시: 주식 거래 기록표에서 빠진 데이터를 채우고, 내 수익률을 표로 정리합니다.
 
 ### 2) 회귀 (지도 학습)
 
-- [LinearRegressionReturn.py](LinearRegressionReturn.py): 거래량/변동성 기반 다음 날 수익률 예측
-  > 예시: "오늘 거래량이 많으면 내일 주가가 얼마나 오를까?" 를 직선으로 예측합니다.
+- [LinearRegressionReturn.py](src/LinearRegressionReturn.py): 이전 5일 수익률 기반 다음 5일 누적 수익률 예측
+  > 예시: "최근 5일이 어떻게 움직였으면 다음 5일이 얼마나 오를까?" 를 직선으로 예측합니다.
 
-- [LinearRegressionFundamental.py](LinearRegressionFundamental.py): PER/PBR/ROE 기반 기대수익률 예측
+- [LinearRegressionFundamental.py](src/LinearRegressionFundamental.py): PER/PBR/ROE 기반 기대수익률 예측
   > 예시: 회사의 성적표(PER, PBR, ROE)를 보고 "이 주식이 얼마나 오를지" 예측합니다.
 
-- [LogisticTradeSignal.py](LogisticTradeSignal.py): RSI/MACD 기반 매수/매도 신호 확률 분류 *(로지스틱 회귀)*
+- [LogisticTradeSignal.py](src/LogisticTradeSignal.py): RSI/MACD 기반 매수/매도 신호 확률 분류 *(로지스틱 회귀)*
   > 예시: "RSI 65, MACD 양수 → 매수 확률 78%" 처럼 확률로 매매 신호를 출력합니다.
 
 ### 3) 분류 모델링 (지도 학습)
 
-- [SvmTradeSignal.py](SvmTradeSignal.py): 모멘텀/거래량 변화율 기반 매수/매도 신호 분류 *(SVM)*
+- [SvmTradeSignal.py](src/SvmTradeSignal.py): 모멘텀/거래량 변화율 기반 매수/매도 신호 분류 *(SVM)*
   > 예시: 두 지표를 보고 "지금 사야 할지, 팔아야 할지" 선 하나로 딱 나눕니다.
 
-- [SvmMarketPhase.py](SvmMarketPhase.py): RSI/MACD/변동성 기반 시장 국면(상승/하락) 분류 *(SVM RBF)*
-  > 예시: 4가지 지표를 보고 "지금 시장이 오르는 중인지 내리는 중인지" 판단합니다.
+- [SvmMarketPhase.py](src/SvmMarketPhase.py): RSI/MACD/변동성 기반 시장 국면(상승/하락) 분류 *(SVM RBF)*
+  > 예시: 3가지 지표를 보고 "지금 시장이 오르는 중인지 내리는 중인지" 판단합니다.
 
 ### 4) 비지도 학습
 
-- [KMeansStockCluster.py](KMeansStockCluster.py): 수익률/변동성 기반 주식 유형 자동 군집화 *(K-Means)*
+- [KMeansStockCluster.py](src/KMeansStockCluster.py): 수익률/변동성 기반 주식 유형 자동 군집화 *(K-Means)*
   > 예시: 아무도 가르쳐 주지 않아도 60개 종목을 성장주/가치주/방어주로 스스로 분류합니다.
 
-- [PcaStockReduce.py](PcaStockReduce.py): 6가지 주식 지표를 2차원으로 압축해 시각화 *(PCA)*
+- [PcaStockReduce.py](src/PcaStockReduce.py): 6가지 주식 지표를 2차원으로 압축해 시각화 *(PCA)*
   > 예시: PER·PBR·ROE·변동성 등 6가지 숫자를 딱 2개로 줄여서 그래프에 표시합니다.
 
 ### 5) 보조 유틸리티
 
-- [korean_font.py](korean_font.py): OS별 한글 폰트 자동 설정 유틸리티
+- [korean_font.py](src/korean_font.py): OS별 한글 폰트 자동 설정 유틸리티
   > 예시: matplotlib 그래프에서 한글 제목/축 라벨이 깨지지 않도록 폰트를 자동으로 지정합니다.
 
 ### 6) 시계열 분석
 
-- [TimeSeriesAnalysis.py](TimeSeriesAnalysis.py): 이동평균·볼린저밴드·ACF/PACF·ADF 정상성 검정
+- [TimeSeriesAnalysis.py](src/TimeSeriesAnalysis.py): 이동평균·볼린저밴드·ACF/PACF·ADF 정상성 검정
   > 예시: 주가의 흐름을 여러 기법으로 분석하고, "이 데이터가 규칙적인가?" 를 수학적으로 확인합니다.
 
-- [ArimaStockForecast.py](ArimaStockForecast.py): ARIMA 모델로 미래 주가 예측 *(통계 기반 시계열)*
-  > 예시: 과거 주가의 패턴과 오차를 수식으로 정리해 40일 후 주가를 예측합니다.
+- [ArimaStockForecast.py](src/ArimaStockForecast.py): ARIMA 모델로 미래 주가 예측 *(통계 기반 시계열)*
+  > 예시: 과거 주가의 패턴과 오차를 수식으로 정리해 1개월 후 주가를 예측합니다.
 
 ### 7) RNN · LSTM (순환 신경망)
 
-- [RnnBackprop.py](RnnBackprop.py): 바닐라 RNN을 numpy로 직접 구현 *(BPTT)*
+- [RnnBackprop.py](src/RnnBackprop.py): 바닐라 RNN을 numpy로 직접 구현 *(BPTT)*
   > 예시: "오늘 주가가 오를까?"를 지난 10일 수익률 흐름을 기억하며 판단합니다.
 
-- [LstmStockPyTorch.py](LstmStockPyTorch.py): PyTorch LSTM으로 주가 시계열 예측
+- [LstmStockPyTorch.py](src/LstmStockPyTorch.py): PyTorch LSTM으로 주가 시계열 예측
   > 예시: 장기 기억(셀 상태)과 단기 기억(은닉 상태)을 분리해 더 정확하게 주가 흐름을 예측합니다.
 
 ### 8) CNN (합성곱 신경망)
 
-- [CnnTimeSeriesFeature.py](CnnTimeSeriesFeature.py): 1D CNN으로 30일 수익률 시퀀스에서 패턴 자동 추출 & 상승/하락 분류
+- [CnnTimeSeriesFeature.py](src/CnnTimeSeriesFeature.py): 1D CNN으로 30일 수익률 시퀀스에서 패턴 자동 추출 & 상승/하락 분류
   > 예시: 연속 3일 수익률이 반복 상승하는 패턴 같은 로컬 특징을 필터가 자동으로 찾습니다.
 
-- [CnnCandleChart.py](CnnCandleChart.py): matplotlib으로 캔들차트를 32×32 이미지로 렌더링 후 2D CNN 분류
+- [CnnCandleChart.py](src/CnnCandleChart.py): matplotlib으로 캔들차트를 32×32 컬러 이미지로 렌더링 후 2D CNN 분류
   > 예시: 캔들차트를 사진처럼 찍어서 "양봉 연속/음봉 반전" 같은 패턴을 이미지로 인식합니다.
 
-- [CnnLstmHybrid.py](CnnLstmHybrid.py): CNN이 단기 윈도우 패턴을 벡터로 압축 → LSTM이 시간 순서 학습 *(하이브리드)*
+- [CnnLstmHybrid.py](src/CnnLstmHybrid.py): CNN이 단기 윈도우 패턴을 벡터로 압축 → LSTM이 시간 순서 학습 *(하이브리드)*
   > 예시: CNN = 하루 뉴스 요약, LSTM = 주간 흐름 파악. 두 강점을 합쳤습니다.
 
 ### 9) Transformer · Attention
 
-- [TransformerAttention.py](TransformerAttention.py): Multi-Head Self-Attention으로 날짜 간 상관관계 학습 & 방향 분류
+- [TransformerAttention.py](src/TransformerAttention.py): Multi-Head Self-Attention으로 날짜 간 상관관계 학습 & 방향 분류
   > 예시: 책을 읽을 때 중요한 단어에 밑줄 긋듯이, 어느 날 주가가 지금 예측에 중요한지 가중치로 학습합니다.
 
 ### 10) 하이퍼파라미터 튜닝 & 검증 전략
 
-- [HyperparamTuning.py](HyperparamTuning.py): K-Fold 교차검증, Grid Search, 과적합(C값/Dropout) 실험
+- [HyperparamTuning.py](src/HyperparamTuning.py): K-Fold 교차검증, Grid Search, 과적합(C값/Dropout) 실험
   > 예시: 모든 레시피를 다 만들어보고 가장 맛있는 것을 고르듯, 파라미터 조합을 전수 탐색합니다.
 
 ### 11) 데이터 정규화 & 전처리
 
-- [YfinanceNormalize.py](YfinanceNormalize.py): yfinance로 실제 주가 다운로드 → Min-Max / Z-점수 / 로그수익률 비교
+- [YfinanceNormalize.py](src/YfinanceNormalize.py): yfinance로 실제 주가 다운로드 → Min-Max / Z-점수 / 로그수익률 비교
   > 예시: 삼성(70,000원)과 AAPL(150달러)를 같은 그래프에 비교하려면 "단위를 통일"해야 합니다.
 
 ### 12) 시계열 윈도우 예측기 (CLI)
 
-- [TimeSeriesWindow.py](TimeSeriesWindow.py): 종목명·윈도우·예측기간·스텝을 입력받아 LSTM으로 예측 *(대화형/CLI)*
-  > 기본값: GS P&N (078935.KS), 20일 윈도우, 5일 후 예측, 스텝=1
-  > CLI: `python3 TimeSeriesWindow.py --ticker AAPL --window 30 --horizon 5 --step 1`
+- [TimeSeriesWindow.py](src/TimeSeriesWindow.py): 종목명·윈도우·예측기간·스텝을 입력받아 LSTM으로 예측 *(대화형/CLI)*
+  > 기본값: GS P&L (078935.KS), 20일 윈도우, 5일 후 예측, 스텝=1
+  > CLI: `python TimeSeriesWindow.py --ticker AAPL --window 30 --horizon 5 --step 1`
 
 ### 13) 딥러닝 & 시각화
 
-- [NeuralNetBackprop.py](NeuralNetBackprop.py): 역전파를 직접 구현한 시계열 주가 예측 *(신경망)*
+- [NeuralNetBackprop.py](src/NeuralNetBackprop.py): 역전파를 직접 구현한 시계열 주가 예측 *(신경망)*
   > 예시: 오답 노트(역전파)를 손으로 직접 구현해 과거 5일 주가로 내일을 예측합니다.
 
-- [HeatmapRiskMask.py](HeatmapRiskMask.py): 수익률 히트맵에서 고위험 구간 마스킹
-  > 예시: 주가 수익률을 색깔 지도로 그리고, 위험한 구간을 빨간색으로 표시합니다.
+- [HeatmapRiskMask.py](src/HeatmapRiskMask.py): 수익률 히트맵에서 고위험 구간 마스킹
+  > 예시: 주가 수익률을 색깔 지도로 그리고, 위험한 구간을 강조 표시합니다.
 
 ---
 
-## 실행 방법
+## 📊 결과 이미지 설명 (result 폴더)
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-sudo apt install fonts-nanum
-python -m pip install --upgrade pip
-pip install pylint
-```
-
-## 결과 이미지 설명 (result 폴더)
-
-각 파일을 실행하면 `result/` 폴더에 이미지가 저장됩니다. 아래에서 각 이미지가 무엇을 보여주는지 쉽게 설명합니다.
+각 파일을 실행하면 `result/` 폴더에 이미지가 저장됩니다.
 
 ---
 
@@ -270,7 +522,6 @@ pip install pylint
 - **대각선 경계** = SVM이 찾아낸 "사야 할지 말아야 할지" 기준선
 
 > 모멘텀이 높고(오른쪽) 거래량 변화율이 높을(위쪽) 수록 매수 신호가 됩니다.
-> 정확도 **0.88** = 100번 중 88번 올바르게 판단합니다.
 
 ---
 
@@ -285,7 +536,6 @@ pip install pylint
 - **파란 점** = 하락장으로 예측된 날
 
 > RSI가 높고(60 이상) MACD가 양수일 때 빨간 점이 집중되어 있습니다.
-> "시장이 강세일 때는 두 지표가 모두 높다"는 패턴을 SVM이 학습했습니다.
 
 ---
 
@@ -296,12 +546,7 @@ pip install pylint
 **무엇을 보여주나요?**
 파란 실선(실제 주가)과 주황 점선(예측 주가)을 비교합니다.
 
-- **실선(파랑)** = 실제로 주가가 움직인 경로
-- **점선(주황)** = 신경망이 "이렇게 움직일 것"이라고 예측한 경로
-
-> 두 선이 비슷하게 올라가는 추세를 따라가면서, 급격한 봉우리는 살짝 뭉개집니다.
-> 이것이 정상입니다 — 신경망은 **전체적인 방향(추세)**은 잘 잡지만, **단기 급등락**은 놓칩니다.
-> 신경망이 충분히 학습되었다면 점선이 실선에 더 가까워집니다.
+> 신경망은 **전체적인 방향(추세)**은 잘 잡지만, **단기 급등락**은 놓칩니다.
 
 ---
 
@@ -309,17 +554,11 @@ pip install pylint
 
 ![HeatmapRiskMask](result/HeatmapRiskMask.png)
 
-**무엇을 보여주나요?**
-3개 패널이 나란히 있습니다. 각 칸은 "특정 날짜의 특정 종목 수익률"입니다.
-
 | 패널 | 내용 |
 |------|------|
 | **왼쪽 (원본)** | 초록=수익, 빨강=손실로 색칠한 원본 수익률 지도 |
-| **가운데 (마스크)** | 수익률이 ±2% 초과인 위험 칸만 **흰색**으로 표시 |
-| **오른쪽 (강조)** | 위험 칸을 더 진한 빨강/초록으로 강조해 한눈에 보이게 함 |
-
-> 가운데 패널에서 **흰색 칸이 많을수록** 그날 시장이 불안정했다는 뜻입니다.
-> 이 기법을 쓰면 위험한 구간을 자동으로 골라낼 수 있습니다.
+| **가운데 (마스크)** | 수익률이 ±2% 초과인 위험 칸만 흰색으로 표시 |
+| **오른쪽 (강조)** | 위험 칸을 더 진한 색으로 강조 |
 
 ---
 
@@ -327,16 +566,10 @@ pip install pylint
 
 ![KMeansStockCluster](result/KMeansStockCluster.png)
 
-**무엇을 보여주나요?**
-아무 힌트 없이 60개 종목을 컴퓨터가 스스로 3그룹으로 나눈 결과입니다.
-
-- **빨간 점 (성장주)** = 오른쪽 위: 수익률 높고 변동성도 높음
-- **파란 점 (가치주)** = 가운데: 수익률·변동성 모두 중간
-- **초록 점 (방어주)** = 왼쪽 아래: 수익률 낮지만 변동성도 낮음
+- **빨간 점 (성장주)** = 수익률 높고 변동성도 높음
+- **파란 점 (가치주)** = 수익률·변동성 모두 중간
+- **초록 점 (방어주)** = 수익률 낮지만 변동성도 낮음
 - **검정 X** = 각 그룹의 중심점(centroid)
-
-> 아무도 "이게 성장주야"라고 가르쳐주지 않았는데, K-Means가 스스로 비슷한 종목끼리 묶었습니다.
-> 이것이 **비지도 학습**의 힘입니다.
 
 ---
 
@@ -344,20 +577,8 @@ pip install pylint
 
 ![PcaStockReduce](result/PcaStockReduce.png)
 
-**무엇을 보여주나요?**
-2개 패널이 나란히 있습니다.
-
-**왼쪽 (설명 분산 비율)**
-- 파란 막대 = 각 주성분(PC)이 전체 정보의 몇 %를 담고 있는지
-- 빨간 계단선 = 앞에서부터 더했을 때 누적 정보량
-- PC1이 약 38%, PC2가 약 29%를 담아, **두 개만으로도 66%** 이상 정보 보존
-
-**오른쪽 (2D 압축 산점도)**
-- 원래 6개 지표를 딱 **2개 숫자(PC1, PC2)**로 압축해서 한 화면에 표시
-- 색깔 = 수익률 (초록=높음, 빨강=낮음)
-
-> 6차원을 2차원으로 줄였는데도 수익률 높은 종목(초록)과 낮은 종목(빨강)이 구분됩니다.
-> 정보를 최대한 살리면서 압축하는 것이 PCA의 목적입니다.
+- 왼쪽: 각 주성분이 전체 정보의 몇 %를 담고 있는지
+- 오른쪽: 6차원 지표를 2차원으로 압축한 산점도 (색깔=수익률)
 
 ---
 
@@ -365,23 +586,9 @@ pip install pylint
 
 ![TimeSeriesAnalysis](result/TimeSeriesAnalysis_078935_KS.png)
 
-**무엇을 보여주나요?**
-3행으로 구성된 종합 분석 차트입니다.
-
-**1행: 이동평균 & 볼린저밴드**
-- 파란 선 = 실제 주가 (들쭉날쭉)
-- 주황/빨강/보라 선 = SMA5·SMA20·SMA60 (날수가 길수록 더 부드러움)
-- 회색 띠 = 볼린저밴드 (주가가 띠 밖으로 나가면 과매수/과매도 신호)
-
-> 짧은 이동평균(주황)이 긴 이동평균(보라)을 **위로 뚫고 올라가는 순간** = "골든크로스" 매수 신호
-
-**2행: 일간 수익률**
-- 빨간 구간 = 오른 날, 파란 구간 = 내린 날
-- 주가(비정상)를 차분하면 이처럼 **위아래로 튀는 정상 시계열**이 됨
-
-**3행: ACF & PACF**
-- 막대가 파란 띠(신뢰구간) 안에 있으면 "이 시점과 관계없다"는 뜻
-- 첫 번째 막대만 튀고 나머지가 띠 안에 있으면 → ARIMA q=1 또는 p=1 힌트
+- **1행:** 이동평균(SMA5/20/60) & 볼린저밴드
+- **2행:** 일간 수익률 (차분 결과)
+- **3행:** ACF & PACF (ARIMA 차수 결정 힌트)
 
 ---
 
@@ -389,21 +596,8 @@ pip install pylint
 
 ![ArimaStockForecast](result/ArimaStockForecast_078935_KS.png)
 
-**무엇을 보여주나요?**
-위아래 2개 패널이 있습니다.
-
-**위 패널: 전체 200일 구간**
-- 파란 선 = 실제 주가
-- 주황 점선 = 학습 구간에서 모델이 데이터에 맞춘 적합값
-- 빨간 선 = 점선 세로선(경계) 이후 실제로 예측한 값
-- 세로 점선 = 학습/테스트 경계 (왼쪽은 본 데이터, 오른쪽은 못 본 데이터)
-
-**아래 패널: 테스트 40일 확대**
-- 실제(파랑)와 예측(빨강 점선)이 얼마나 가까운지 확인
-- 회색 영역 = 오차 구간 (좁을수록 예측이 정확)
-
-> ARIMA는 단기 예측에 강하지만, 멀리 갈수록 불확실해집니다.
-> 테스트 RMSE ≈ 1.34원 — 주가의 1% 내외 오차로 추세를 잘 따라갑니다.
+- **위 패널:** 전체 과거 주가 + 22거래일 미래 예측 + 95% 신뢰 구간(분홍 띠)
+- **아래 패널:** 최근 6개월 확대 + 예측 마커
 
 ---
 
@@ -411,21 +605,8 @@ pip install pylint
 
 ![RnnBackprop](result/RnnBackprop_078935_KS.png)
 
-**무엇을 보여주나요?**
-2개 패널이 나란히 있습니다.
-
-**왼쪽: BCE 학습 손실 곡선**
-- 에폭이 늘어날수록 손실이 천천히 줄어드는 것을 확인
-- 0.693 근처에서 시작해 조금씩 내려감 (0.693 = ln2 = 완전 무작위 수준)
-- 손실이 잘 안 내려가는 이유: 바닐라 RNN의 **기울기 소실 문제** 때문
-
-**오른쪽: 예측 방향 결과**
-- 빨간 막대 = 상승 예측, 파란 막대 = 하락 예측
-- 금색 점 = 정답과 일치, 검정 점 = 오답
-- 정확도 55% — 동전 던지기(50%)보다 약간 높은 수준
-
-> 이것이 바닐라 RNN의 한계입니다. 시퀀스가 길어질수록 초반 정보를 잊어버립니다.
-> 이 한계를 게이트(망각·입력·출력)로 해결한 것이 **LSTM**입니다.
+- **왼쪽:** BCE 손실 곡선 (0.693 근처에서 시작 → 기울기 소실 한계)
+- **오른쪽:** 예측 방향 막대 (금색=정답, 검정=오답)
 
 ---
 
@@ -433,38 +614,17 @@ pip install pylint
 
 ![LstmStockPyTorch](result/LstmStockPyTorch_078935_KS.png)
 
-**무엇을 보여주나요?**
-2개 패널이 나란히 있습니다.
-
-**왼쪽: MSE 손실 곡선**
-- 처음 몇 에폭 만에 손실이 **수직 낙하** → LSTM이 빠르게 패턴을 학습
-- 이후 완만하게 수렴 → 더 학습해도 크게 개선되지 않는 포화 구간
-
-**오른쪽: 실제 vs LSTM 예측**
-- 파란 실선(실제)은 매일 오르내리며 들쭉날쭉
-- 빨간 점선(예측)은 **전체 추세와 방향을 부드럽게 따라감**
-- MAE ≈ 1.58원 — 평균적으로 실제 주가와 약 1.58원 차이
-
-> LSTM은 주가의 정확한 숫자보다 **오르는 구간/내리는 구간**을 파악하는 데 강합니다.
-> RNN과 달리 셀 상태(C_t)라는 장기 기억이 있어 20일치 흐름을 한꺼번에 고려할 수 있습니다.
+- **왼쪽:** MSE 손실 곡선 (수직 낙하 후 수렴)
+- **오른쪽:** 실제(파랑) vs LSTM 예측(빨강) 비교
 
 ---
 
-### LogisticTradeSignal_078935_KS.png — 로지스틱 회귀 매수/매도 확률
+### LogisticTradeSignal_078935_KS.png — 로지스틱 회귀 매수/매도
 
 ![LogisticTradeSignal](result/LogisticTradeSignal_078935_KS.png)
 
-**무엇을 보여주나요?**
-배경 색깔이 그라데이션으로 칠해져 있고, 그 위에 실제 매수/매도 신호 점들이 찍혀 있습니다.
-
-- **배경 초록 구역** = 이 위치에서는 "매수 확률이 높다"
-- **배경 빨간 구역** = 이 위치에서는 "매도/관망 확률이 높다"
-- **빨간 점** = 실제 매수 신호 데이터
-- **파란 점** = 실제 매도/관망 데이터
-
-> 선형 회귀가 "주가가 얼마나 오를지 숫자"를 예측한다면,
-> 로지스틱 회귀는 "매수할 확률이 몇 %인지"를 예측합니다.
-> RSI가 높고(오른쪽) MACD가 양수(위)일 때 초록 배경이 짙어지는 것을 볼 수 있습니다.
+- **초록 배경:** 매수 확률이 높은 구역
+- **빨간 배경:** 매도/관망 확률이 높은 구역
 
 ---
 
@@ -472,22 +632,7 @@ pip install pylint
 
 ![CnnTimeSeriesFeature](result/CnnTimeSeriesFeature_078935_KS.png)
 
-**무엇을 보여주나요?**
-4개 패널로 구성됩니다.
-
-**1~2행: 학습 손실·정확도**
-- 에폭이 늘수록 손실이 내려가고 정확도가 올라가는 정상 학습 곡선
-- 빨간 점선(50% 기준선)을 넘어야 동전 던지기보다 나음
-
-**3행: 테스트 샘플 상승 예측 확률**
-- 빨간 막대 = "오를 것 같다", 파란 막대 = "내릴 것 같다"
-- 막대 높이가 50%보다 높을수록 모델이 확신하는 상승 신호
-
-**4행: 첫 번째 Conv1d 레이어 특징 맵**
-- 16개 필터 중 8개를 겹쳐서 그린 활성화 그래프
-- 필터마다 서로 다른 날짜 구간에서 강하게 반응 → 각자 다른 패턴을 포착
-
-> 특정 필터가 "5일 연속 양수" 구간에서 크게 튀면, 그 필터는 상승 추세 패턴을 학습한 것입니다.
+- 학습 손실·정확도 + 예측 확률 막대 + Conv1d 특징 맵 4패널
 
 ---
 
@@ -495,19 +640,7 @@ pip install pylint
 
 ![CnnCandleChart](result/CnnCandleChart_078935_KS.png)
 
-**무엇을 보여주나요?**
-3행 4열 레이아웃입니다.
-
-**1~2행: 캔들차트 샘플 이미지 6장**
-- 각 이미지는 10개 캔들이 그려진 32×32 흑백 픽셀
-- 제목에 "상승▲" 또는 "하락▼" 정답 레이블과 색깔 표시
-- 빨간 캔들(양봉) = 종가 > 시가, 파란 캔들(음봉) = 종가 < 시가
-
-**3행: 학습 손실·정확도**
-- Conv2d가 캔들 형태(이미지 패턴)를 직접 픽셀에서 학습
-
-> 주가를 이미지로 변환해 컴퓨터 비전(CV) 기법으로 분석하는 독특한 접근법입니다.
-> 단순 수치가 아닌 "시각적 패턴"으로 추세를 인식합니다.
+- 캔들차트 샘플 이미지 6장 + 학습 손실·정확도
 
 ---
 
@@ -515,16 +648,7 @@ pip install pylint
 
 ![CnnLstmHybrid](result/CnnLstmHybrid_078935_KS.png)
 
-**무엇을 보여주나요?**
-2×2 레이아웃 + 모델 구조 텍스트입니다.
-
-- **왼쪽 위**: 학습 손실 — CNN과 LSTM이 합쳐진 구조가 빠르게 수렴
-- **오른쪽 위**: 학습 정확도 + 테스트 최종 정확도
-- **아래**: 테스트 상승 예측 확률 막대 그래프
-- **왼쪽 박스**: CNN(1→16→32)→LSTM(32→64)→Linear 구조 요약
-
-> CNN이 10일 단위 "단기 패턴 벡터"를 뽑고, LSTM이 6개 벡터를 시간 순서로 처리합니다.
-> 두 모델의 강점을 결합해 단독 모델보다 일반적으로 안정적인 성능을 냅니다.
+- CNN(단기 패턴) → LSTM(시간 흐름) → Linear(분류) 구조
 
 ---
 
@@ -532,19 +656,7 @@ pip install pylint
 
 ![TransformerAttention](result/TransformerAttention_078935_KS.png)
 
-**무엇을 보여주나요?**
-2행 3열 레이아웃입니다.
-
-**1행: 학습 손실·정확도·예측 확률**
-- Transformer도 에폭이 늘수록 손실이 내려가는 정상 학습 확인
-
-**2행: Self-Attention 가중치 히트맵**
-- 가로/세로 축 모두 "날짜(0~29일)" 위치
-- **밝은(흰/노란) 칸** = 두 날짜가 서로 높은 Attention 가중치를 가짐
-- 대각선 방향 밝은 띠 = 가까운 날짜끼리 서로 주의를 기울임
-
-> Attention 히트맵은 "모델이 어느 날짜를 참고해 지금 결정을 내리는지"를 시각화합니다.
-> 특정 날짜 열이 전체적으로 밝으면 그 날이 예측에 중요한 "핵심 일자"라는 뜻입니다.
+- **Self-Attention 히트맵:** 모델이 어느 날짜를 참고해 예측하는지 시각화
 
 ---
 
@@ -552,27 +664,7 @@ pip install pylint
 
 ![HyperparamTuning](result/HyperparamTuning.png)
 
-**무엇을 보여주나요?**
-2×2 레이아웃입니다.
-
-**왼쪽 위: Grid Search CV 히트맵**
-- 가로 = kernel(linear/rbf), 세로 = C 값
-- 초록(밝을수록) = 교차검증 정확도 높음
-- 가장 밝은 칸이 최적 파라미터 조합
-
-**오른쪽 위: C 값에 따른 과적합**
-- 빨간 선(학습 정확도)이 파란 선(검증 정확도)보다 높은 구간 = 과적합
-- C가 커질수록 학습 정확도는 100%에 가까워지지만 검증은 오히려 떨어짐
-
-**왼쪽 아래: Dropout 효과**
-- 점선(학습)이 실선(검증)과 가까울수록 과적합이 없는 것
-- Dropout 0.5를 쓰면 두 선의 격차가 줄어드는 것을 확인
-
-**오른쪽 아래: K-Fold 교차검증**
-- 5번의 서로 다른 분할로 학습해 평균 ± 표준편차를 계산
-- 막대마다 정확도 숫자, 빨간 점선 = 평균
-
-> "운 좋은 한 번의 테스트"가 아닌 5번 평균으로 신뢰도를 높이는 것이 핵심입니다.
+- Grid Search 히트맵 + C값 과적합 곡선 + Dropout 효과 + K-Fold 결과
 
 ---
 
@@ -580,20 +672,7 @@ pip install pylint
 
 ![YfinanceNormalize](result/YfinanceNormalize_078935_KS.png)
 
-**무엇을 보여주나요?**
-3행 2열 레이아웃입니다.
-
-**① 원본 가격**: AAPL(~150달러), 삼성(~70,000원), S&P500(~4,000p)이 스케일이 달라서 한 그래프에 비교 불가
-
-**② Min-Max 정규화 [0,1]**: 세 종목 모두 0~1로 통일 → 등락 방향 비교 가능
-
-**③ Z-점수 정규화**: 평균 기준 몇 표준편차인지로 표현 → 이상치(급등락) 탐지에 유리
-
-**④ 로그 수익률**: 일일 변화율을 ln으로 변환 → 정상 시계열에 가까워짐
-
-**⑤ 로그수익률 분포**: 정규분포(종 모양)에 가까울수록 통계 모델 적용 가능
-
-> 딥러닝 입력에는 Min-Max 또는 Z-점수, 통계 분석에는 로그수익률이 일반적입니다.
+- 원본 / Min-Max / Z-점수 / 로그수익률 / 분포 5패널 비교
 
 ---
 
@@ -601,20 +680,4 @@ pip install pylint
 
 ![TimeSeriesWindow](result/TimeSeriesWindow_078935_KS_w20_h5.png)
 
-**무엇을 보여주나요?**
-2×2 레이아웃입니다.
-
-**왼쪽 위: 윈도우 샘플 5개**
-- 각 선 = 20일치 정규화된 주가 시퀀스
-- LSTM이 이 모양들의 패턴을 학습
-
-**오른쪽 위: LSTM 학습 손실**
-- 에폭이 늘수록 MSE 손실 감소 → 수렴 확인
-
-**왼쪽 아래: 예측 vs 실제**
-- 파란 선(실제)과 주황 점선(5일 후 예측)이 얼마나 가까운지 확인
-
-**오른쪽 아래: 실행 설정 요약**
-- 종목, 윈도우, 예측기간, MAE/RMSE, 미래 예측 가격 한눈에 확인
-
-> 파라미터를 바꿔서 실행하면 다른 종목·기간의 예측 이미지가 result 폴더에 저장됩니다.
+- 윈도우 샘플 + LSTM 손실 + 예측 vs 실제 + 실행 설정 요약 4패널
