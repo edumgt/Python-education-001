@@ -1,10 +1,12 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
 # Python 주식투자 머신러닝 실습 커리큘럼
 
 > Python 기초부터 Transformer 딥러닝까지 — **주식투자 데이터 분석**을 주제로 단계별로 학습합니다.
 
 ---
 
-## 📁 프로젝트 구조
+## <i class="fa-solid fa-folder"></i> 프로젝트 구조
 
 ```
 python-ml-class/
@@ -30,7 +32,7 @@ python-ml-class/
 
 ---
 
-## 🚀 빠른 시작 (Quick Start)
+## <i class="fa-solid fa-rocket"></i> 빠른 시작 (Quick Start)
 
 ### 1단계: 환경 요구사항
 
@@ -71,11 +73,11 @@ python NumpyStockArray.py
 
 ---
 
-## 📚 학습 로드맵
+## <i class="fa-solid fa-book-open"></i> 학습 로드맵
 
 아래 순서대로 실습하면 **기초 → 중급 → 고급** 순으로 체계적으로 학습할 수 있습니다.
 
-### 🟢 1단계: Python 기초 & 데이터 처리 (입문)
+### <i class="fa-solid fa-circle" style="color:#22c55e;"></i> 1단계: Python 기초 & 데이터 처리 (입문)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
@@ -84,11 +86,11 @@ python NumpyStockArray.py
 | 3 | `PandasPortfolio.py` | Pandas DataFrame, 결측치 처리, groupby | 20분 |
 | 4 | `YfinanceNormalize.py` | 실제 주가 다운로드, Min-Max/Z-점수/로그수익률 | 25분 |
 
-> 💡 **학습 포인트:** 브로드캐스팅, 슬라이싱, fillna, 정규화의 필요성
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** 브로드캐스팅, 슬라이싱, fillna, 정규화의 필요성
 
 ---
 
-### 🔵 2단계: 머신러닝 기초 — 회귀 & 분류 (초급)
+### <i class="fa-solid fa-circle" style="color:#3b82f6;"></i> 2단계: 머신러닝 기초 — 회귀 & 분류 (초급)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
@@ -96,11 +98,11 @@ python NumpyStockArray.py
 | 6 | `LinearRegressionReturn.py` | 선형 회귀: 과거 5일 수익률 → 미래 5일 예측 | 30분 |
 | 7 | `LogisticTradeSignal.py` | 로지스틱 회귀: RSI/MACD → 매수/매도 분류 | 30분 |
 
-> 💡 **학습 포인트:** 지도 학습, 오차 함수(MAE/MSE), 결정 경계, 시그모이드
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** 지도 학습, 오차 함수(MAE/MSE), 결정 경계, 시그모이드
 
 ---
 
-### 🔵 3단계: 머신러닝 심화 — SVM & 비지도 학습 (초급~중급)
+### <i class="fa-solid fa-circle" style="color:#3b82f6;"></i> 3단계: 머신러닝 심화 — SVM & 비지도 학습 (초급~중급)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
@@ -110,11 +112,11 @@ python NumpyStockArray.py
 | 11 | `PcaStockReduce.py` | PCA: 6차원 → 2차원 차원 축소 | 25분 |
 | 12 | `HyperparamTuning.py` | Grid Search, K-Fold, 과적합/Dropout 실험 | 40분 |
 
-> 💡 **학습 포인트:** 마진 최대화, RBF 커널, centroid, 주성분, 교차검증
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** 마진 최대화, RBF 커널, centroid, 주성분, 교차검증
 
 ---
 
-### 🟡 4단계: 시계열 분석 & ARIMA (중급)
+### <i class="fa-solid fa-circle" style="color:#eab308;"></i> 4단계: 시계열 분석 & ARIMA (중급)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
@@ -122,22 +124,22 @@ python NumpyStockArray.py
 | 14 | `ArimaStockForecast.py` | ARIMA(2,1,2): 1개월 미래 주가 예측 | 35분 |
 | 15 | `HeatmapRiskMask.py` | 히트맵 & 마스킹: 고위험 구간 탐지 | 20분 |
 
-> 💡 **학습 포인트:** 정상성, 차분, AR/MA 차수, AIC, 95% 신뢰 구간
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** 정상성, 차분, AR/MA 차수, AIC, 95% 신뢰 구간
 
 ---
 
-### 🟠 5단계: 딥러닝 기초 — 신경망 직접 구현 (중급)
+### <i class="fa-solid fa-circle" style="color:#f97316;"></i> 5단계: 딥러닝 기초 — 신경망 직접 구현 (중급)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
 | 16 | `NeuralNetBackprop.py` | NumPy만으로 역전파 직접 구현 | 45분 |
 | 17 | `RnnBackprop.py` | 바닐라 RNN + BPTT 직접 구현 | 45분 |
 
-> 💡 **학습 포인트:** 순전파/역전파, 체인룰, BPTT, 기울기 소실
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** 순전파/역전파, 체인룰, BPTT, 기울기 소실
 
 ---
 
-### 🟠 6단계: PyTorch 딥러닝 (중급~고급)
+### <i class="fa-solid fa-circle" style="color:#f97316;"></i> 6단계: PyTorch 딥러닝 (중급~고급)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
@@ -147,17 +149,17 @@ python NumpyStockArray.py
 | 21 | `CnnCandleChart.py` | 2D CNN: 캔들차트 이미지 분류 | 45분 |
 | 22 | `CnnLstmHybrid.py` | CNN + LSTM 하이브리드 | 45분 |
 
-> 💡 **학습 포인트:** 셀 상태, 게이트, Conv1d/Conv2d, 슬라이딩 윈도우
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** 셀 상태, 게이트, Conv1d/Conv2d, 슬라이딩 윈도우
 
 ---
 
-### 🔴 7단계: Transformer (고급)
+### <i class="fa-solid fa-circle" style="color:#ef4444;"></i> 7단계: Transformer (고급)
 
 | 순서 | 파일 | 주제 | 예상 시간 |
 |------|------|------|----------|
 | 23 | `TransformerAttention.py` | Multi-Head Self-Attention: 방향 분류 & Attention 히트맵 | 60분 |
 
-> 💡 **학습 포인트:** Q/K/V, Positional Encoding, Attention 가중치 시각화
+> <i class="fa-solid fa-lightbulb"></i> **학습 포인트:** Q/K/V, Positional Encoding, Attention 가중치 시각화
 
 ---
 
@@ -203,7 +205,7 @@ ls ../result/          # 생성된 파일 목록 확인
 
 ---
 
-## 📖 학습 자료 활용법
+## <i class="fa-solid fa-book"></i> 학습 자료 활용법
 
 ### `docs/` 폴더 — 코드를 초등학생 언어로 설명한 문서
 
@@ -231,7 +233,7 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 
 ---
 
-## 💡 실습 팁 & 심화 과제
+## <i class="fa-solid fa-lightbulb"></i> 실습 팁 & 심화 과제
 
 ### 기본 실습 후 해볼 수 있는 심화 과제
 
@@ -258,16 +260,16 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 ### 디버깅 체크리스트
 
 ```
-✅ yfinance 데이터 오류 → 인터넷 연결 및 종목 코드 확인 (KS종목은 .KS 붙이기)
-✅ 한글 깨짐 → sudo apt install fonts-nanum 후 재실행
-✅ CUDA 오류 → torch.device('cpu')로 강제 변경
-✅ ModuleNotFoundError → pip install -r requirements.txt 재실행
-✅ result/ 폴더 없음 → src/ 폴더 안에서 실행하고 있는지 확인
+<i class="fa-solid fa-circle-check"></i> yfinance 데이터 오류 → 인터넷 연결 및 종목 코드 확인 (KS종목은 .KS 붙이기)
+<i class="fa-solid fa-circle-check"></i> 한글 깨짐 → sudo apt install fonts-nanum 후 재실행
+<i class="fa-solid fa-circle-check"></i> CUDA 오류 → torch.device('cpu')로 강제 변경
+<i class="fa-solid fa-circle-check"></i> ModuleNotFoundError → pip install -r requirements.txt 재실행
+<i class="fa-solid fa-circle-check"></i> result/ 폴더 없음 → src/ 폴더 안에서 실행하고 있는지 확인
 ```
 
 ---
 
-## 📘 딥러닝(DL)과 머신러닝(ML)의 작동 원리 이해
+## <i class="fa-solid fa-book"></i> 딥러닝(DL)과 머신러닝(ML)의 작동 원리 이해
 
 ### 1. 머신러닝/딥러닝의 알고리즘은 모두 오차를 줄이기 위한 것인가?
 
@@ -275,7 +277,7 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 
 머신러닝과 딥러닝의 핵심 목표는 **"컴퓨터가 정답과 예측값 사이의 차이(오차)를 최대한 줄이게 만드는 것"** 입니다.
 
-> **🎯 쉬운 예시: 과녁 맞히기**
+> **<i class="fa-solid fa-bullseye"></i> 쉬운 예시: 과녁 맞히기**
 > 처음 화살을 쏘면 과녁 중심에서 멀리 빗나갑니다(오차가 큼).
 > 빗나간 거리를 보고 "조금 더 오른쪽으로, 조금 더 위로" 하며 교정합니다.
 > 여러 번 반복할수록 과녁 중심에 가까워집니다.
@@ -292,7 +294,7 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 * **손실 함수 (Loss Function):** 오차를 숫자로 나타내는 공식입니다.
 * **최적화 (Optimization):** 오차를 0에 가깝게 줄여나가는 방법입니다.
 
-> **📚 쉬운 예시: 선생님이 채점해주는 시험**
+> **<i class="fa-solid fa-book-open"></i> 쉬운 예시: 선생님이 채점해주는 시험**
 > 학생(모델)이 시험을 봅니다 → 선생님(정답지)이 채점합니다 → 틀린 문제를 다시 공부합니다.
 > 이 과정을 반복하면 점수(정확도)가 올라갑니다.
 >
@@ -305,7 +307,7 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 * **대상:** 군집화(Clustering), 차원 축소(PCA) 등
 * **원리:** 정답 없이 데이터 안에서 비슷한 것끼리 묶거나 패턴을 찾습니다.
 
-> **🍎 쉬운 예시: 과일 분류하기**
+> **<i class="fa-solid fa-apple-whole"></i> 쉬운 예시: 과일 분류하기**
 > 사과, 바나나, 포도가 섞여 있는 바구니에서 아무도 "이게 사과야"라고 알려주지 않아도,
 > 모양·색깔·크기가 비슷한 것끼리 스스로 그룹을 만듭니다.
 >
@@ -318,7 +320,7 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 * **대상:** 알파고, 자율주행 등
 * **원리:** 행동할 때마다 점수(보상)를 받고, 점수를 최대로 높이는 전략을 배웁니다.
 
-> **🎮 쉬운 예시: 비디오 게임**
+> **<i class="fa-solid fa-gamepad"></i> 쉬운 예시: 비디오 게임**
 > 게임 캐릭터가 적을 잡으면 +10점, 떨어지면 -5점.
 > 점수를 올리려면 어떻게 움직여야 할지 수천 번 게임을 해보며 스스로 배웁니다.
 >
@@ -343,11 +345,11 @@ $$\text{Output} = WX + b$$
 딥러닝의 최소 단위인 **퍼셉트론(Perceptron)**이 이 공식과 똑같이 작동합니다.
 딥러닝은 이 계산 단위를 수천, 수만 개 연결한 거대한 그물망입니다.
 
-> **🧱 쉬운 예시: 레고 블록 쌓기**
+> **<i class="fa-solid fa-cube"></i> 쉬운 예시: 레고 블록 쌓기**
 > 레고 블록 하나(선형회귀) 혼자는 단순한 모양만 만들 수 있습니다.
 > 하지만 수천 개를 조립하면(딥러닝) 로봇·성·자동차 같은 복잡한 것도 만들 수 있습니다.
 
-> **💡 비선형 활성화 함수 (Activation Function)**
+> **<i class="fa-solid fa-lightbulb"></i> 비선형 활성화 함수 (Activation Function)**
 > 레고 블록만 단순히 쌓으면 결국 직선 모양밖에 안 됩니다.
 > 중간에 **ReLU·시그모이드 같은 "꺾는 함수"** 를 끼워 넣으면 구불구불한 곡선도 표현할 수 있습니다.
 > 현실 세계의 복잡한 주가 패턴도 이렇게 표현합니다.
@@ -359,7 +361,7 @@ $$\text{Output} = WX + b$$
 * **방향:** 입력층 → 은닉층 → 출력층 (앞으로 전진)
 * **역할:** 입력 데이터를 받아 최종 예측값을 만들고, 정답과 비교해 오차를 계산합니다.
 
-> **📖 쉬운 예시: 시험 문제 풀기**
+> **<i class="fa-solid fa-book"></i> 쉬운 예시: 시험 문제 풀기**
 > 문제를 읽고(입력) → 생각하고(은닉층) → 답을 씁니다(출력).
 > 채점하면 몇 점 틀렸는지(오차) 알 수 있습니다.
 
@@ -370,7 +372,7 @@ $$\text{Output} = WX + b$$
 * **방향:** 출력층 → 은닉층 → 입력층 (뒤로 후진)
 * **역할:** 오차를 거꾸로 추적하며 각 계산 단위가 얼마나 틀림에 기여했는지 파악하고, 가중치를 조금씩 수정합니다.
 
-> **✏️ 쉬운 예시: 시험 오답 노트**
+> **<i class="fa-solid fa-pen"></i> 쉬운 예시: 시험 오답 노트**
 > 틀린 문제를 다시 보며(역방향) → "어디서 실수했지?" 추적 → 그 부분을 집중 공부(가중치 수정).
 > 이 과정을 반복하면 점점 더 잘 풀게 됩니다.
 
@@ -380,7 +382,7 @@ $$\text{Output} = WX + b$$
 
 순전파(문제 풀기)와 역전파(오답 노트)를 수천, 수만 번 반복하면서 최적의 예측 모델이 완성됩니다.
 
-> **🏋️ 쉬운 예시: 운동 연습**
+> **<i class="fa-solid fa-dumbbell"></i>️ 쉬운 예시: 운동 연습**
 > 농구 자유투를 처음엔 잘 못 넣습니다.
 > 매일 100번씩 던지고(순전파), 어떻게 틀렸는지 교정하며(역전파) 연습합니다.
 > 수천 번 반복하면 거의 다 넣을 수 있게 됩니다.
@@ -504,7 +506,7 @@ $$\text{Output} = WX + b$$
 
 ---
 
-## 📊 결과 이미지 설명 (result 폴더)
+## <i class="fa-solid fa-chart-bar"></i> 결과 이미지 설명 (result 폴더)
 
 각 파일을 실행하면 `result/` 폴더에 이미지가 저장됩니다.
 
