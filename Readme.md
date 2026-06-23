@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 # Python 주식투자 머신러닝 실습 커리큘럼
-
+ 
 > Python 기초부터 Transformer 딥러닝까지 — **주식투자 데이터 분석**을 주제로 단계별로 학습합니다.
 
 ---
