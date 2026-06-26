@@ -6,6 +6,10 @@
 
 ---
 
+![alt text](image.png)
+
+---
+
 ## <i class="fa-solid fa-folder"></i> 프로젝트 구조
 
 ```

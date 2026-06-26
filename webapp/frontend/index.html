@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock ML — 주식 예측 AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <a class="header-logo" href="/">
+      <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+      <span class="logo-text">Stock<span>ML</span></span>
+    </a>
+    <div class="header-divider"></div>
+    <span class="header-subtitle">주식 예측 AI 대시보드</span>
+    <div class="header-spacer"></div>
+    <div class="header-badge">
+      <div class="dot"></div>
+      Python · PyTorch · sklearn
+    </div>
+  </header>
+
+  <!-- ── App body ── -->
+  <div class="app-body">
+
+    <!-- ── Sidebar ── -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div id="modelList"></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="padding:12px">
+        <div class="sidebar-info">
+          <div class="sidebar-info-title"><i class="fas fa-lightbulb"></i> 사용 팁</div>
+          <div class="sidebar-info-text">
+            종목 코드 예시<br>
+            <b>078935.KS</b> GS피앤엘<br>
+            <b>005930.KS</b> 삼성전자<br>
+            <b>AAPL</b> Apple Inc.<br>
+            <b>^GSPC</b> S&P 500
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ── Main ── -->
+    <main class="main">
+
+      <!-- Input card -->
+      <div class="input-card">
+        <div class="input-title">
+          <i class="fas fa-search" style="color:var(--primary)"></i>
+          종목 & 모델 설정
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>종목 코드 (Ticker)</label>
+            <input id="tickerInput" type="text" value="078935.KS" placeholder="e.g. 005930.KS, AAPL" />
+          </div>
+          <button class="btn btn-primary" id="runBtn">
+            <i class="fas fa-play"></i>
+            <span>분석 실행</span>
+          </button>
+          <div id="statusBar" class="status-bar"></div>
+        </div>
+
+        <div class="ticker-list" id="tickerChips"></div>
+
+        <!-- Dynamic params panel -->
+        <div id="paramsPanel" class="params-panel"></div>
+      </div>
+
+      <!-- Results section -->
+      <div id="resultsSection"></div>
+
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
