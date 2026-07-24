@@ -24,6 +24,7 @@ python-ml-class/
 │   ├── NumpyStockArray.md
 │   ├── PandasPortfolio.md
 │   ├── ... (총 23개)
+│   └── CloudMlMapping.md   ← 전체 커리큘럼의 AWS/GCP 클라우드 대응 가이드
 │
 ├── result/                 ← 실행 후 자동 저장되는 PNG + MD 분석 파일
 │   ├── NumpyStockArray.png
@@ -226,6 +227,10 @@ docs/LstmStockPyTorch.md    ← LstmStockPyTorch.py 의 코드 설명
 2. 실제 `src/[파일명].py` 소스를 열어 코드를 확인합니다.
 3. 코드를 직접 실행해 `result/` 폴더에 그래프를 생성합니다.
 4. `result/[파일명].md` 를 읽어 결과 해석 방법을 확인합니다.
+
+### `docs/CloudMlMapping.md` — AWS/GCP 클라우드 대응 가이드
+
+개별 파일 설명이 아니라, **커리큘럼 전체(23개 파일 + webapp)를 가로질러** 각 단계에서 쓰인 라이브러리·기법(NumPy/Pandas, scikit-learn, statsmodels, PyTorch, 강화학습 등)이 AWS·GCP의 어떤 관리형 서비스에 대응하는지, 실제 CLI/SDK 사용법과 함께 비교한 문서입니다. 로컬 실습을 마친 뒤 클라우드로 규모를 확장하고 싶을 때 참고하세요.
 
 ### `result/` 폴더 — 실행 결과 PNG + 분석 가이드
 
