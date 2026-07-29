@@ -78,6 +78,179 @@ python NumpyStockArray.py
 
 ---
 
+## <i class="fa-brands fa-aws"></i> AWS에서 이 커리큘럼 확장하기
+
+이 저장소는 현재 **로컬 PC에서 yfinance로 데이터를 받고, 모델을 학습·추론하는 실습용 구조**입니다. AWS로 옮길 때는 코드를 처음부터 다시 만들기보다, 데이터·학습·배포의 책임을 아래처럼 나누는 것이 좋습니다.
+
+| 목적 | 이 저장소에서 해당하는 내용 | 권장 AWS 리소스 | 사용하는 시점 |
+|------|----------------------------|-----------------|--------------|
+| 원천/결과 보관 | yfinance 시세 CSV, `result/` 그래프, 학습 산출물 | **Amazon S3** | 가장 먼저 |
+| 정기 시세 수집 | `YfinanceNormalize.py` | **EventBridge Scheduler + AWS Lambda + S3** | 매일 자동 수집이 필요할 때 |
+| 전처리·피처 생성 | Pandas 정규화, RSI/MACD, 학습/검증 분할 | **SageMaker AI Processing** | 데이터가 커지거나 재현 가능한 배치 작업이 필요할 때 |
+| scikit-learn 학습 | 선형/로지스틱 회귀, SVM, K-Means, PCA | **SageMaker AI Training** (scikit-learn 컨테이너) | 로컬보다 큰 CPU 자원이 필요할 때 |
+| PyTorch 학습 | LSTM, CNN, CNN-LSTM, Transformer | **SageMaker AI Training** (PyTorch 컨테이너, 필요 시 GPU) | 6~7단계 실습을 GPU에서 돌릴 때 |
+| 실험·모델 이력 | 파라미터, 지표, 승인된 모델 버전 | **SageMaker AI Experiments / Model Registry** | 모델을 반복 비교하거나 팀으로 운영할 때 |
+| 일괄 예측 | 종목 여러 개의 다음 날/다음 주 예측 | **SageMaker Batch Transform** | 실시간 응답이 필요 없을 때 |
+| 웹앱 배포 | `webapp/backend` Flask API + 정적 화면 | **AWS App Runner** 또는 **ECS Fargate** | 현재 웹앱을 그대로 서비스할 때 |
+| 실시간 모델 추론 | 저장된 PyTorch/scikit-learn 모델 호출 API | **SageMaker AI Real-time Endpoint** | 학습 모델을 저장·재사용하도록 바꾼 뒤 |
+| 로그·알림 | 학습 로그, Lambda/App Runner 오류 | **Amazon CloudWatch** | 모든 운영 단계 |
+
+> **권장 시작점:** 이 수업 규모에서는 `S3 → SageMaker AI Training → S3`만 먼저 연결해도 충분합니다. 현재 `webapp`은 요청마다 데이터를 받고 일부 모델을 다시 학습하므로, 바로 SageMaker Endpoint로 바꾸기보다는 먼저 학습된 모델을 S3에 저장하고 앱 시작 시 불러오는 구조로 분리하는 편이 좋습니다.
+
+`Amazon SageMaker AI`는 2024년 12월 기존 Amazon SageMaker의 새 이름이며, AWS CLI/API 네임스페이스는 호환성을 위해 계속 `sagemaker`를 사용합니다. 자세한 서비스 개요는 [AWS 공식 문서](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html)를 참고하세요.
+
+### AWS CLI 사전 준비
+
+아래 예시는 서울 리전(`ap-northeast-2`)을 기준으로 합니다. AWS CLI v2를 설치하고, 개인 액세스 키 대신 가능하면 IAM Identity Center(SSO) 프로필 또는 EC2/CloudShell의 IAM 역할을 사용하세요.
+
+```bash
+# SSO를 사용하는 경우. 조직의 시작 URL과 리전은 자신의 환경 값으로 입력합니다.
+aws configure sso --profile ml-class
+aws sts get-caller-identity --profile ml-class
+
+# 이후 예시에서 공통으로 쓸 값
+export AWS_PROFILE=ml-class
+export AWS_REGION=ap-northeast-2
+export BUCKET="python-ml-class-<고유한-버킷-이름>"
+```
+
+SageMaker 작업에는 S3 읽기/쓰기와 CloudWatch Logs 권한을 가진 **SageMaker 실행 역할(Role ARN)** 이 필요합니다. 교육용으로도 `AdministratorAccess`를 붙이지 말고, 관리자에게 해당 S3 버킷 범위로 제한한 역할을 요청하세요. 역할의 신뢰 주체는 `sagemaker.amazonaws.com`이어야 합니다.
+
+```bash
+# 이미 만들어진 실행 역할을 확인하고 ARN을 환경 변수에 넣습니다.
+aws iam get-role --role-name SageMakerExecutionRole \
+  --query 'Role.Arn' --output text
+
+export SAGEMAKER_ROLE_ARN="arn:aws:iam::<account-id>:role/SageMakerExecutionRole"
+```
+
+### 1) S3에 데이터와 실습 결과 올리기
+
+S3를 데이터 레이크의 가장 작은 단위로 사용합니다. 버킷 이름은 전 세계에서 고유해야 하며, 아래 명령은 서울 리전용입니다.
+
+```bash
+# 버킷 생성 및 기본 암호화 설정
+aws s3api create-bucket \
+  --bucket "$BUCKET" \
+  --region "$AWS_REGION" \
+  --create-bucket-configuration LocationConstraint="$AWS_REGION"
+
+aws s3api put-bucket-encryption --bucket "$BUCKET" \
+  --server-side-encryption-configuration \
+  '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+
+# 예: 수집한 CSV를 raw 영역에, 실습 결과를 result 영역에 업로드
+aws s3 cp ./data/005930.KS.csv "s3://$BUCKET/raw/ticker=005930.KS/"
+aws s3 sync ./result "s3://$BUCKET/results/"
+
+# 업로드 결과 확인
+aws s3 ls "s3://$BUCKET/" --recursive
+```
+
+`./data/005930.KS.csv`는 예시 경로입니다. 이 저장소에는 기본 데이터 폴더가 없으므로, `YfinanceNormalize.py`를 약간 확장해 CSV를 저장한 뒤 업로드하거나 별도 수집 Lambda가 S3 `raw/` 경로에 저장하도록 구성하면 됩니다.
+
+### (선택) 평일 종가 데이터 자동 수집 예약
+
+정기 수집이 필요하면 yfinance 수집 코드를 Lambda 패키지 또는 컨테이너 이미지로 배포하고, EventBridge 규칙이 Lambda를 호출하게 만듭니다. 아래 시간은 **평일 20:30 KST(= 11:30 UTC)** 이며, EventBridge 규칙의 cron은 UTC 기준입니다.
+
+```bash
+export FUNCTION_NAME=stock-price-collector
+export FUNCTION_ARN=$(aws lambda get-function \
+  --function-name "$FUNCTION_NAME" \
+  --query 'Configuration.FunctionArn' --output text)
+
+aws events put-rule \
+  --name daily-stock-pull \
+  --schedule-expression 'cron(30 11 ? * MON-FRI *)' \
+  --state ENABLED
+
+export RULE_ARN=$(aws events describe-rule --name daily-stock-pull \
+  --query 'Arn' --output text)
+
+aws lambda add-permission \
+  --function-name "$FUNCTION_NAME" \
+  --statement-id allow-eventbridge-daily-stock-pull \
+  --action lambda:InvokeFunction \
+  --principal events.amazonaws.com \
+  --source-arn "$RULE_ARN"
+
+aws events put-targets --rule daily-stock-pull \
+  --targets "Id"="1","Arn"="$FUNCTION_ARN"
+```
+
+Lambda 실행 역할에는 대상 S3 경로의 `s3:PutObject` 권한만 부여하고, API 키처럼 민감한 값이 생기면 코드나 명령행이 아니라 AWS Secrets Manager에 보관하세요. 이 예시는 Lambda 함수가 이미 배포되어 있다는 전제입니다.
+
+### 2) SageMaker AI Processing/Training 작업 제출하기
+
+`PandasPortfolio.py`, `YfinanceNormalize.py`의 정규화·피처 생성을 Processing Job으로, `LstmStockPyTorch.py`·`CnnLstmHybrid.py`·`TransformerAttention.py`의 학습을 Training Job으로 옮길 수 있습니다. 두 작업 모두 입력은 S3, 결과 모델/로그는 S3·CloudWatch로 남습니다.
+
+AWS CLI의 입력 스키마는 자주 확장되므로, 먼저 설치된 CLI가 만드는 최신 템플릿을 생성해 필요한 값만 채우는 방식을 권장합니다.
+
+```bash
+# Processing Job 템플릿: 입력 S3, 처리 컨테이너 이미지, 실행 역할, 출력 S3를 채웁니다.
+aws sagemaker create-processing-job \
+  --generate-cli-skeleton input > processing-job.json
+
+# Training Job 템플릿: TrainingImage, RoleArn, InputDataConfig,
+# OutputDataConfig, ResourceConfig, StoppingCondition을 채웁니다.
+aws sagemaker create-training-job \
+  --generate-cli-skeleton input > training-job.json
+
+# 작성한 설정 파일로 작업 제출
+aws sagemaker create-processing-job \
+  --cli-input-json file://processing-job.json
+
+aws sagemaker create-training-job \
+  --cli-input-json file://training-job.json
+```
+
+`training-job.json`에서는 이 레포의 PyTorch 학습 스크립트를 컨테이너의 `/opt/ml/code/`에 포함하고, 데이터는 `/opt/ml/input/data/train/`, 모델은 `/opt/ml/model/`에 쓰도록 맞추면 됩니다. CPU 실습에는 `ml.m5.xlarge` 정도부터 시작하고, LSTM/CNN/Transformer가 느릴 때만 `ml.g5.xlarge` 같은 GPU 인스턴스를 선택하세요. 반드시 `StoppingCondition.MaxRuntimeInSeconds`를 설정해 비용 상한을 두는 것이 좋습니다.
+
+```bash
+# 상태와 생성된 모델 아티팩트 S3 위치 확인
+aws sagemaker describe-training-job \
+  --training-job-name <training-job-name> \
+  --query '{Status:TrainingJobStatus,ModelArtifacts:ModelArtifacts.S3ModelArtifacts}'
+
+# 실행 중인 작업을 더 이상 사용하지 않으면 중지
+aws sagemaker stop-training-job --training-job-name <training-job-name>
+```
+
+SageMaker Training Job은 완료 후 지정한 S3 경로에 모델 아티팩트를 저장합니다. 필요한 필드와 비용 제한 옵션은 [AWS CLI `create-training-job` 문서](https://docs.aws.amazon.com/cli/latest/reference/sagemaker/create-training-job.html), Processing Job 입력 형식은 [`create-processing-job` 문서](https://docs.aws.amazon.com/cli/latest/reference/sagemaker/create-processing-job.html)에서 확인할 수 있습니다.
+
+### 3) 저장된 모델을 실시간 API로 배포하기 (선택)
+
+학습 결과를 웹앱에서 반복 사용하도록 변경했다면 `create-model → create-endpoint-config → create-endpoint` 순서로 SageMaker AI Endpoint를 만듭니다. Endpoint는 유휴 상태여도 인스턴스 비용이 발생하므로, 수업 실습에는 Batch Transform 또는 App Runner에서 직접 모델을 로드하는 방식이 더 경제적일 수 있습니다.
+
+```bash
+# 모델, 엔드포인트 설정, 엔드포인트 정의 JSON은 각각 최신 CLI 템플릿으로 생성합니다.
+aws sagemaker create-model --generate-cli-skeleton input > model.json
+aws sagemaker create-endpoint-config --generate-cli-skeleton input > endpoint-config.json
+aws sagemaker create-endpoint --generate-cli-skeleton input > endpoint.json
+
+aws sagemaker create-model --cli-input-json file://model.json
+aws sagemaker create-endpoint-config --cli-input-json file://endpoint-config.json
+aws sagemaker create-endpoint --cli-input-json file://endpoint.json
+
+# endpoint.json의 이름이 stock-predict-endpoint인 경우의 추론 호출 예시
+aws sagemaker-runtime invoke-endpoint \
+  --endpoint-name stock-predict-endpoint \
+  --content-type application/json \
+  --body fileb://request.json response.json
+```
+
+실습을 마친 뒤에는 생성 역순으로 반드시 삭제하세요. Endpoint가 Endpoint Config와 Model을 참조하므로, 먼저 Endpoint를 지워야 합니다.
+
+```bash
+aws sagemaker delete-endpoint --endpoint-name stock-predict-endpoint
+aws sagemaker delete-endpoint-config --endpoint-config-name stock-predict-config
+aws sagemaker delete-model --model-name stock-predict-model
+```
+
+Endpoint 생성·삭제 및 추론 호출의 세부 형식은 [AWS CLI Endpoint 문서](https://docs.aws.amazon.com/cli/latest/reference/sagemaker/create-endpoint.html)를 참고하세요. 더 넓은 AWS/GCP 대응표와 Python SDK 예시는 [CloudMlMapping.md](docs/CloudMlMapping.md)에 정리되어 있습니다.
+
+---
+
 ## <i class="fa-solid fa-book-open"></i> 학습 로드맵
 
 아래 순서대로 실습하면 **기초 → 중급 → 고급** 순으로 체계적으로 학습할 수 있습니다.
